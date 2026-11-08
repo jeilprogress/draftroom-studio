@@ -1,8 +1,25 @@
 # Draftroom · iMessage Studio
 
-A private, static conversation studio for writers. A calm black/deep-navy workspace with frosted panels and independent iOS 18 Classic and iOS 27 Liquid Glass-inspired previews.
+A private, static creative workspace for writers. A calm black/deep-navy home screen opens independent Messages and Calls studios, each with iOS 18 Classic and iOS 27 Liquid Glass-inspired previews.
 
-[Open Draftroom](https://jeilprogress.github.io/draftroom-studio/). GitHub Pages publishes the configured repository source; no application build is required. Keep index.html, styles.css, studio.css, app.js, .nojekyll, and vendor/ together.
+[Open Draftroom](https://jeilprogress.github.io/draftroom-studio/). GitHub Pages publishes the configured repository source; no application build is required. The home page is `index.html`, Messages is `messages.html`, and Calls is `calls.html`. Keep these pages with their adjacent CSS/JS files, `.nojekyll`, and `vendor/`.
+
+## Home and Calls
+
+The Draftroom wordmark and top-right Home link return to the studio picker. The Messages studio retains its existing editor, previews and storage key. Calls uses a separate `draftroom-calls-v1` browser draft; navigating between studios does not replace either draft.
+
+The Calls studio includes:
+
+- Classic and Liquid Glass-inspired interfaces, with graphite, ocean, plum and color-poster backgrounds
+- Outgoing/calling, incoming/ringing, connected and ended screens
+- Saved-contact name, number label and uploaded photo, or an editable unknown phone number with a fictional example-number generator
+- Editable phone time, battery percentage and static call duration
+- Independent clickable speaker and mute states, also reflected in the settings panel and saved picture
+- Slide/click to answer, accept/decline, end and call-back visual transitions
+- FaceTime Audio selection, visual keypad, hold notice and reminder/message visual feedback
+- Screen-only or phone-frame PNG/JPG export and image clipboard copying
+
+These are fictional screen controls. No real calls, microphone/camera access, notifications, messages or reminders are initiated.
 
 ## Features
 
@@ -38,7 +55,7 @@ npx playwright install chromium
 npm test
 ```
 
-The smoke test starts a local server and checks message creation, dates, groups, photo and video uploads/playback, persistence, all four version/theme combinations, eight legacy PNG downloads, clean PNG/JPG images, real clipboard copying and denied-permission fallback, emoji sequences, stacked contact identity, JSON round trips, and mobile overflow. Screenshots and exports go to ignored test-results/.
+The Messages smoke test checks message creation, dates, groups, photo and video uploads/playback, persistence, all four version/theme combinations, eight legacy PNG downloads, clean PNG/JPG images, real clipboard copying and denied-permission fallback, emoji sequences, stacked contact identity, JSON round trips, and mobile overflow. The Calls test checks navigation, preservation of the Messages draft, all four call screens in both appearances, caller identity/photo, generated numbers, duration, mute/speaker, keypad, answer/end transitions, reload persistence, eight PNG exports, JPG, clipboard copying and mobile layout. Screenshots and exports go to ignored `test-results/`. Use `npm run test:messages` or `npm run test:calls` for an individual studio.
 
 ## Third-party license
 

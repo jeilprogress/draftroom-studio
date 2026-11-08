@@ -14,7 +14,7 @@ const server=http.createServer(async(req,res)=>{
   try{
     const context=await browser.newContext({viewport:{width:1440,height:1000},acceptDownloads:true});
     const page=await context.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));
-    await page.goto(`http://127.0.0.1:${server.address().port}`);
+    await page.goto(`http://127.0.0.1:${server.address().port}/messages.html`);
     await page.waitForSelector('.chat-bubble');
     assert.equal(await page.locator('.message-card').count(),5);
     await page.waitForSelector('#emoji-tray .ios-emoji');

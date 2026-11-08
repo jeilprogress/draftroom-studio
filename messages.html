@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#080d18" />
+  <meta name="description" content="A private, browser-based fictional iMessage conversation creator for writers." />
+  <title>Draftroom · iMessage Studio</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="studio.css" />
+</head>
+<body>
+  <div class="site">
+    <header class="topbar">
+      <a class="brand-lockup" href="./" aria-label="Draftroom home" style="color:inherit;text-decoration:none"><div class="brand-symbol"><span></span><span></span></div><div class="brand-wordmark">draftroom<span class="brand-dot">.</span><small>WRITER'S STUDIO</small></div></a>
+      <div class="topbar-center"><span class="online-dot"></span><span>iMessage studio</span><span class="topbar-slash">/</span><span class="muted">Your stories, your screen</span></div>
+      <div class="topbar-actions"><a class="button soft" href="./" style="text-decoration:none;display:inline-flex;align-items:center">Home ↗</a><span id="save-status" class="save-status">Saved in this browser</span><button class="button soft top-action" id="import-project">Import project</button><button class="button soft top-action" id="export-project">Save project</button><button class="button dark" id="export-phone">Save image <span aria-hidden="true">↗</span></button></div>
+    </header>
+
+    <div class="app-layout">
+      <aside class="settings-panel panel" aria-label="Conversation settings">
+        <div class="panel-scroll settings-scroll">
+          <div class="eyebrow">01 / BUILD YOUR WORLD</div>
+          <h1>A little space<br>for your <em>story.</em></h1>
+          <p class="intro">Set the scene. The conversation on the right updates while you write.</p>
+
+          <section class="form-section"><div class="section-head"><h2>iOS interface</h2><span class="section-index">A</span></div>
+            <div class="segmented" id="version-control" role="group" aria-label="iOS appearance"><button type="button" data-version="18" class="selected">iOS 18 <small>Classic</small></button><button type="button" data-version="27">iOS 27 <small>Liquid Glass</small></button></div>
+            <div class="info-hint" id="version-hint">The familiar, minimal Messages interface.</div>
+          </section>
+          <section class="form-section"><div class="section-head"><h2>Appearance</h2><span class="section-index">B</span></div>
+            <label class="field-label">Display mode</label><div class="segmented compact" id="theme-control"><button type="button" class="selected" data-theme="light">☀ &nbsp;Day</button><button type="button" data-theme="dark">☾ &nbsp;Night</button></div>
+            <label class="field-label space-top">Message bubbles</label><div class="segmented compact" id="color-control"><button type="button" class="selected" data-color="blue"><span class="bubble-swatch blue"></span>Blue</button><button type="button" data-color="green"><span class="bubble-swatch green"></span>Green</button></div>
+            <div id="wallpaper-row" class="wallpaper-row" hidden><label class="field-label space-top" for="wallpaper">Chat background</label><select id="wallpaper" class="field-input"><option value="sky">Blue sky</option><option value="garden">Botanical glow</option><option value="aurora">Aurora</option><option value="plain">Plain</option></select><label class="field-label space-top" for="glass-intensity">Liquid Glass tint <span id="glass-value" class="glass-value">55%</span></label><input id="glass-intensity" class="glass-slider" type="range" min="0" max="100" value="55" aria-label="Liquid Glass opacity" /><label class="mini-upload">Upload a custom background<input type="file" id="wallpaper-upload" accept="image/*" hidden /></label></div>
+          </section>
+          <section class="form-section"><div class="section-head"><h2>Conversation</h2><span class="section-index">C</span></div>
+            <label class="field-label">Chat type</label><div class="segmented compact" id="type-control"><button class="selected" data-kind="single" type="button">One on one</button><button data-kind="group" type="button">Group chat</button></div>
+            <div class="field-block"><label class="field-label" for="chat-name" id="chat-name-label">Contact name or nickname</label><input class="field-input" id="chat-name" placeholder="e.g. Mathine" maxlength="70" /></div>
+            <div id="single-contact" class="contact-editor"><label class="field-label">Contact photo</label><label class="avatar-drop" id="contact-drop"><span id="contact-avatar-preview" class="avatar-preview">M</span><span>Choose or drop a photo <small>PNG, JPG, WEBP</small></span><input type="file" id="contact-upload" accept="image/*" hidden /></label></div>
+            <div id="group-editor" hidden><div class="participant-heading"><span class="field-label">Members</span><button class="inline-action" id="add-member" type="button">+ Add member</button></div><div id="participant-list"></div><p class="info-hint">Select each member as a sender in the message editor.</p></div>
+          </section>
+          <section class="form-section"><div class="section-head"><h2>Story details</h2><span class="section-index">D</span></div>
+            <div class="two-fields"><div><label class="field-label" for="phone-time">Phone time</label><input class="field-input" id="phone-time" value="9:41" maxlength="8" /></div><div><label class="field-label" for="date-text">Date label</label><input class="field-input" id="date-text" placeholder="Today 9:41 AM" maxlength="50" /></div></div>
+            <label class="field-label space-top" for="chat-status">Conversation status</label><select class="field-input" id="chat-status"><option value="normal">Available</option><option value="dnd">Focus · Do Not Disturb</option><option value="blocked">Cannot send messages</option></select>
+            <label class="field-label space-top" for="receipt-style">Default receipt</label><select class="field-input" id="receipt-style"><option value="delivered">Delivered</option><option value="read">Read</option><option value="none">None</option></select>
+          </section>
+          <div class="settings-footer"><button class="button soft full" id="reset-project" type="button">↺ &nbsp; Start a new conversation</button><p>Private by default. Drafts and uploads stay on this device.</p></div>
+        </div>
+      </aside>
+
+      <main class="composer-panel panel" aria-label="Message editor">
+        <div class="composer-top"><div><div class="eyebrow">02 / WRITE THE SCENE</div><h2>Conversation editor</h2><p>Tap a message to change its words, sender, or order.</p></div><div class="count-pill" id="message-count">0 messages</div></div>
+        <div class="tools-wrap"><div class="tool-label">INSERT INTO CONVERSATION</div><div class="tools">
+          <button type="button" class="tool" data-add="text"><span class="tool-icon">✎</span>Text</button>
+          <button type="button" class="tool" data-add="image"><span class="tool-icon">▧</span>Photo</button>
+          <button type="button" class="tool" data-add="video"><span class="tool-icon">▶</span>Video</button>
+          <button type="button" class="tool" data-add="timestamp"><span class="tool-icon">◷</span>Time</button>
+          <button type="button" class="tool" data-add="system"><span class="tool-icon">✦</span>Event</button>
+          <button type="button" class="tool" data-add="typing"><span class="tool-icon">•••</span>Typing</button>
+        </div></div>
+        <div id="cards-scroll" class="cards-scroll"><div id="message-cards" class="message-cards"></div></div>
+        <div class="quick-composer"><div class="quick-heading"><span>QUICK MESSAGE</span><span class="kbd-hint">Ctrl + Enter to send</span></div><div class="quick-row"><select id="quick-sender" aria-label="Quick message sender" class="quick-sender"></select><textarea id="quick-text" rows="2" placeholder="Type the next line of your story..."></textarea><button id="quick-send" class="quick-send" type="button" aria-label="Add this message">↑</button></div><div class="emoji-row"><span>EMOJIS</span><div id="emoji-tray" class="emoji-tray"></div></div></div>
+      </main>
+
+      <section class="preview-panel" aria-label="Live conversation preview"><div class="preview-top"><div><div class="eyebrow">03 / THE FINAL LOOK</div><h2>Live preview <span class="live-indicator"></span></h2></div><div class="preview-actions"><button class="button soft small" id="export-full">Full chat PNG</button><button class="button soft small" id="download-phone">Phone PNG</button></div></div>
+        <div class="preview-stage"><div id="phone-shell" class="phone-shell is-ios18"><div id="phone-screen" class="phone-screen"><div class="dynamic-island" aria-hidden="true"></div><div class="statusbar"><div id="status-time">9:41</div><div class="status-icons"><svg viewBox="0 0 65 18" width="65" height="18" fill="currentColor" aria-hidden="true"><path d="M2 13h4v3H2zM8 10h4v6H8zM14 7h4v9h-4zM20 3h4v13h-4z"/><path d="M32 7c4-4 10-4 14 0l-2 2c-3-2.6-7-2.6-10 0zM36 11c2-2 5-2 7 0l-3.5 4z"/><rect x="50" y="4" rx="3" width="13" height="11" fill="none" stroke="currentColor" stroke-width="1.6"/><rect x="52" y="6" rx="1.5" width="9" height="7"/><rect x="64" y="7.5" width="2" height="4" rx="1"/></svg></div></div><div class="chat-header"><div class="nav-left"><span class="back-arrow">‹</span><span class="unread-count">12</span></div><div id="phone-identity" class="phone-identity"><div id="phone-avatar" class="phone-avatar">M</div><div id="phone-name" class="phone-name">Mathine</div><div id="phone-subtitle" class="phone-subtitle">⌄</div></div><div class="nav-right" title="FaceTime video"><svg width="25" height="19" viewBox="0 0 26 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="1" y="3" width="16" height="14" rx="4"/><path d="M18 7l7-4v14l-7-4"/></svg></div></div><div id="chat-wallpaper" class="chat-wallpaper"></div><div id="chat-log" class="chat-log" aria-live="polite"></div><div class="phone-bottom"><div id="blocked-notice" class="blocked-notice" hidden>You cannot send messages to this conversation.</div><div class="compose-bar"><span class="compose-plus">+</span><div class="compose-field">iMessage <span class="mic-icon" aria-hidden="true"><svg viewBox="0 0 16 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="5" y="2" width="6" height="12" rx="3"/><path d="M2 10v2a6 6 0 0 0 12 0v-2M8 18v4M5 22h6"/></svg></span></div></div><div class="home-indicator"></div></div></div></div></div>
+        <div class="preview-caption"><span class="preview-caption-dot"></span> A fictional conversation, ready for your story.</div>
+      </section>
+
+      <nav class="apps-dock" aria-label="Apps"><div class="dock-caption">APPS</div><button id="app-imessage" class="dock-app selected" type="button" aria-label="Open iMessage studio" title="iMessage"><span class="imessage-logo"><svg viewBox="0 0 48 48" width="34" height="34" aria-hidden="true"><path fill="#fff" d="M24 8C13 8 4 15.1 4 24c0 5.4 3.3 10.2 8.4 13.1L10 44l9.1-4.2c1.6.4 3.3.6 4.9.6 11 0 20-7.2 20-16.4S35 8 24 8Z"/></svg></span><small>Messages</small></button><div class="dock-separator"></div><div class="dock-placeholder" title="More apps can be added here">＋</div><div class="dock-spacer"></div><span class="dock-version">v1.0</span></nav>
+    </div>
+    <div id="toast" class="toast" role="status" aria-live="polite"></div><input type="file" id="project-upload" accept=".json,application/json" hidden /><input type="file" id="media-upload" accept="image/*,video/*" hidden />
+  </div>
+  <dialog id="image-dialog" class="image-dialog" aria-labelledby="image-dialog-title">
+    <div class="image-dialog-head"><div><div class="eyebrow">READY TO SHARE</div><h2 id="image-dialog-title">Save your conversation</h2></div><button id="close-image-dialog" class="icon-button" aria-label="Close image preview">×</button></div>
+    <div class="image-dialog-body">
+      <div class="image-preview-stage" id="image-preview-stage"><img id="image-preview" alt="Your conversation image, ready to copy or save" hidden /><p id="image-preview-status" role="status">Preparing image…</p></div>
+      <div class="image-options"><label for="image-layout" class="field-label">Picture layout</label><select id="image-layout" class="field-input"><option value="conversation">Conversation only</option><option value="full">Full screen · entire chat</option><option value="phone">Phone frame · visible chat</option></select><p class="info-hint">Conversation only keeps the contact header and every message, just like a cropped chat screenshot.</p><div class="image-downloads"><button id="save-image-png" class="button dark">Save PNG</button><button id="save-image-jpg" class="button soft">Save JPG</button><button id="copy-image" class="button soft">Copy image</button></div><p class="image-copy-hint">You can also right-click the picture to copy or save it. On a phone, touch and hold.</p><p id="image-action-status" role="status" aria-live="polite"></p></div>
+    </div>
+  </dialog>
+  <script src="vendor/html2canvas.min.js" defer></script>
+  <script src="vendor/emoji/map.js" defer></script>
+  <script src="emoji.js" defer></script>
+  <script src="app.js" defer></script>
+</body>
+</html>
