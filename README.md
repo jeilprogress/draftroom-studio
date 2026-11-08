@@ -7,18 +7,20 @@ A private, static creative workspace for writers. A calm black/deep-navy home sc
 [Open Lock Screen](https://jeilprogress.github.io/draftroom-studio/lockscreen.html), the third studio on the home screen. Messages and Calls code and drafts are kept separate.
 
 - Classic and Liquid Glass-inspired notification cards, wallpaper controls and clock materials
-- Nine system-font clock interpretations, three numeral sets, font weight/color/size controls, glass opacity and vertical stretching with a draggable or keyboard-adjustable resize handle
+- Nine clock interpretations, with rounded SVG numerals for the standard/rounded/thin/bold/condensed/outline styles and local fonts for the remaining styles, three numeral sets, font weight/color/size controls, glass opacity and vertical stretching with a draggable or keyboard-adjustable resize handle
 - Editable date/inline widget line and 12 widget types: weather, temperature, battery, activity rings, calendar, alarm, world clock, reminders, stocks, sunrise, moon and custom; a four-space row that can sit below the clock or near the bottom
 - Six original wallpaper presets, photo uploads, zoom/position/dim controls and an optional transparent foreground upload for layered depth
-- **48 bundled app icons** (38 App Store entries and 10 system-app illustrations), plus live App Store search and custom app/icon uploads
+- **49 bundled app icons** (39 App Store entries and 10 system-app illustrations), plus live App Store search and custom app/icon uploads
 - App-specific presets for Messages/group texts/media, missed calls, FaceTime, X posts/replies/quotes, Instagram DMs/story mentions/likes, Facebook interactions and Discord messages; arbitrary editable notifications for any other app
 - Sender/title/subtitle/body/time/count, Time Sensitive labels, sender photos and thumbnails; duplicate, reorder and delete controls
+- Contact-led notification layout with a circular sender photo and small app badge at its lower-right corner
+- GCash money-received preset with editable PHP amount, sender name and reference number, plus a random 13-digit reference generator
 - List, grouped Stack and Count layouts, expandable groups, notification privacy previews and optional Notification Center title
 - Do Not Disturb, Sleep, Work, Personal, Driving or custom Focus, including an expandable silenced-notification summary and dimmed Always-On appearance
 - Carrier/network/battery/charging, lock symbol, Dynamic Island/notch, selectable and clickable bottom shortcuts, and a visual Now Playing card
 - Independent browser draft, portable JSON backup/import, screen or phone-frame PNG/JPG and clipboard image copying
 
-Clock styles and glass are web approximations using local fonts; they do not bundle Apple's fonts, reproduce native optical refraction or automatically segment a wallpaper subject. The transparent foreground upload provides the depth layer. The phone picture captures the visible part of the notification list; scroll the preview to choose which cards are visible. Widgets and notifications are fictional editable values, not live account data or installed apps. App Store search sends only the typed app query to Apple; selected remote icons are embedded locally when available. See `vendor/lock-apps/NOTICE.md` for artwork provenance.
+Clock styles and glass are web approximations using licensed rounded numeral outlines and local fonts; they do not bundle Apple's fonts, reproduce native optical refraction or automatically segment a wallpaper subject. The transparent foreground upload provides the depth layer. The phone picture captures the visible part of the notification list; scroll the preview to choose which cards are visible. Widgets and notifications are fictional editable values, not live account data or installed apps. App Store search sends only the typed app query to Apple; selected remote icons are embedded locally when available. See `vendor/lock-apps/NOTICE.md` for artwork provenance.
 
 Design references: [Apple Lock Screen customization](https://support.apple.com/en-am/guide/iphone/-iph4d0e6c351/ios), [Apple Lock Screen features and notification views](https://support.apple.com/en-ph/guide/iphone/-iphcd5c65ccf/ios), and [Apple Search API](https://developer.apple.com/library/archive/documentation/AudioVideo/Conceptual/iTuneSearchAPI/index.html).
 
