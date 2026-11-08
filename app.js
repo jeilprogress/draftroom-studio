@@ -9,7 +9,7 @@
   const bubbleTail='<svg xmlns="http://www.w3.org/2000/svg" width="14" height="19" viewBox="0 0 14 19"><path d="M0 0C1 9 4 14 14 17C8 20 2 18 0 14Z" fill="currentColor"/></svg>';
   const defaults = () => ({
     version:'18',theme:'light',color:'blue',kind:'single',chatName:'Mathine',contactPhoto:'',phoneTime:'9:41',
-    dateText:'Today 9:41 AM',chatStatus:'normal',receipt:'delivered',wallpaper:'sky',wallpaperImage:'',glass:55,
+    dateText:'Today 9:41 AM',chatStatus:'normal',receipt:'delivered',wallpaper:'sky',wallpaperImage:'',glass:55,focusNotifyAnyway:false,
     participants:[{id:'member_1',name:'Mathine',photo:''},{id:'member_2',name:'Ayi',photo:''}],
     messages:[
       {id:uid(),type:'timestamp',text:'Today 9:41 AM',from:'contact'},
@@ -85,7 +85,7 @@
       else if(m.type==='system')body=`<select class="small-select event-select" data-event-kind="${escape(m.id)}">${eventKinds.map(([v,label])=>`<option value="${v}" ${m.eventKind===v?'selected':''}>${label}</option>`).join('')}</select><textarea data-msg-text="${escape(m.id)}" aria-label="System event text" rows="2" placeholder="A system event…" style="margin-top:8px">${escape(m.text)}</textarea>`;
       else if(m.type==='typing')body='<div class="info-hint">Animated three-dot typing indicator appears in the phone preview.</div>';
       else if(m.type==='image'||m.type==='video'){const src=m.type==='image'?mediaUrls.get(m.mediaId):(m.poster||'');body=`<button class="card-media" type="button" data-media-button="${escape(m.id)}">${src?`<img src="${escape(src)}" alt="Uploaded ${m.type}"/>${m.type==='video'?'<span class="overlay-play">▶</span>':''}`:`<span>+ &nbsp; Choose ${m.type==='image'?'a photo':'a video'} to attach</span>`}</button><div class="info-hint">${escape(m.fileName||'No file selected')}${m.type==='video'?' · PNG export uses a still preview':''}</div>`;}
-      const receipt=(m.type==='text'||m.type==='image'||m.type==='video')?`<label>Receipt <select class="small-select" data-receipt="${escape(m.id)}"><option value="default" ${(m.receipt||'default')==='default'?'selected':''}>Default</option><option value="none" ${m.receipt==='none'?'selected':''}>None</option><option value="delivered" ${m.receipt==='delivered'?'selected':''}>Delivered</option><option value="read" ${m.receipt==='read'?'selected':''}>Read</option><option value="failed" ${m.receipt==='failed'?'selected':''}>Not delivered</option></select></label>`:'';
+      const receipt=(m.type==='text'||m.type==='image'||m.type==='video')?`<label>Receipt <select class="small-select" data-receipt="${escape(m.id)}"><option value="default" ${(m.receipt||'default')==='default'?'selected':''}>Default</option><option value="none" ${m.receipt==='none'?'selected':''}>None</option><option value="delivered" ${m.receipt==='delivered'?'selected':''}>Delivered</option><option value="read" ${m.receipt==='read'?'selected':''}>Read</option><option value="quietly" ${m.receipt==='quietly'?'selected':''}>Delivered Quietly</option><option value="failed" ${m.receipt==='failed'?'selected':''}>Not Delivered</option></select></label>`:'';
       return `<article class="message-card ${m.from==='me'?'from-me':''} type-${escape(m.type)}" data-card="${escape(m.id)}">${top}${body}${receipt?`<div class="card-bottom">${receipt}</div>`:''}</article>`;
     }).join('');
   }
@@ -97,8 +97,8 @@
     const tailImages=[false,true].map(mine=>`<img class="bubble-tail" alt="" aria-hidden="true" width="14" height="19" src="data:image/svg+xml,${encodeURIComponent(bubbleTail.replace('fill="currentColor"',`fill="${bubbleColors.getPropertyValue(mine?'--outgoing':'--incoming').trim()}"`))}" />`);
     const tailFor=mine=>tailImages[Number(mine)];
     $('status-time').textContent=state.phoneTime||'9:41';$('phone-name').innerHTML=emojiText(state.chatName||(state.kind==='group'?'Group Chat':'Contact'));
-    $('phone-subtitle').textContent=state.chatStatus==='dnd'?'☾ Notifications silenced':'⌄';
-    $('phone-subtitle').classList.toggle('dnd',state.chatStatus==='dnd');
+    $('phone-subtitle').textContent='⌄';
+    $('phone-subtitle').classList.remove('dnd');
     if(state.kind==='group'){
       $('phone-avatar').className='phone-avatar group-stack';$('phone-avatar').innerHTML=state.participants.slice(0,3).map(p=>`<span class="stack-avatar">${p.photo?`<img src="${escape(p.photo)}" alt="" />`:escape((p.name||'?')[0].toUpperCase())}</span>`).join('');
     }else{
@@ -109,9 +109,12 @@
       if(m.type==='timestamp')return `<div class="chat-event timestamp">${escape(m.text)}</div>`;
       if(m.type==='system')return `<div class="chat-event">${escape(m.text)}</div>`;
       const from=effectiveSender(m.from),mine=from==='me';
+      const receipt=m.receipt==='default'||!m.receipt?state.receipt:m.receipt;
+      const failed=mine&&receipt==='failed'&&['text','image','video'].includes(m.type);
       const previous=state.messages[i-1],next=state.messages[i+1];
-      const grouped=Boolean(previous&&effectiveSender(previous.from)===from&&!['timestamp','system'].includes(previous.type)&&previous.type!=='typing');
-      const clusterEnd=!next||['timestamp','system','typing'].includes(next.type)||m.type==='typing'||effectiveSender(next.from)!==from;
+      const previousReceipt=previous?.receipt==='default'||!previous?.receipt?state.receipt:previous.receipt;
+      const grouped=Boolean(previous&&!failed&&!(effectiveSender(previous.from)==='me'&&previousReceipt==='failed')&&effectiveSender(previous.from)===from&&!['timestamp','system'].includes(previous.type)&&previous.type!=='typing');
+      const clusterEnd=failed||!next||['timestamp','system','typing'].includes(next.type)||m.type==='typing'||effectiveSender(next.from)!==from;
       const speaker=state.kind==='group'&&!mine&&!grouped?`<div class="speaker-name">${escape(senderName(from))}</div>`:'';
       let content='';
       if(m.type==='text'){const count=window.DraftroomEmoji?.count(m.text)||0;content=`<div class="chat-bubble ${count?`emoji-only emoji-count-${count}`:''}">${emojiText(m.text||' ')}${tailFor(mine)}</div>`;}
@@ -121,11 +124,12 @@
         content=`<div class="chat-bubble media"><div class="media-frame">${src?`<img src="${escape(src)}" alt="${m.type==='image'?'Photo':'Video still'}">`:`<div class="media-placeholder">${m.type==='image'?'Photo':'Video'}</div>`}${m.type==='video'?`<div class="media-play" ${m.mediaId?`data-play-video="${escape(m.mediaId)}" title="Play video" role="button" tabindex="0"`:''}><span>▶</span></div>`:''}</div></div>`;
       }
       const hasFollowingMine=mine&&next&&effectiveSender(next.from)==='me'&&!['timestamp','system'].includes(next.type);
-      const receipt=m.receipt==='default'||!m.receipt?state.receipt:m.receipt;
-      const receiptText={delivered:'Delivered',read:'Read',failed:'Not Delivered',none:''}[receipt]||'';
-      const receiptMarkup=mine&&!hasFollowingMine&&m.type!=='typing'&&receiptText?`<div class="receipt">${receiptText}</div>`:'';
-      return `<div class="chat-row ${mine?'mine':''} ${grouped?'grouped':''} ${clusterEnd?'cluster-end':''}">${speaker}<div class="bubble-wrap">${content}${state.kind==='group'&&!mine?senderAvatar(from):''}</div>${receiptMarkup}</div>`;
-    }).join('');
+      const quiet=receipt==='quietly'||receipt==='delivered'&&state.chatStatus==='dnd'&&!state.focusNotifyAnyway;
+      const receiptText=quiet?'Delivered Quietly':({delivered:'Delivered',read:'Read',failed:'Not Delivered',none:''}[receipt]||'');
+      const receiptMarkup=mine&&(failed||!hasFollowingMine)&&m.type!=='typing'&&receiptText?`<div class="receipt ${failed?'receipt-failed':''}">${receiptText}</div>`:'';
+      const accessory=failed?'<span class="send-failure" role="img" aria-label="Message not delivered">!</span>':(m.type==='image'||m.type==='video')?`<button class="media-share" type="button" data-share-media="${escape(m.id)}" aria-label="Save ${m.type==='image'?'photo':'video'}" title="Save ${m.type==='image'?'photo':'video'}"><img alt="" width="17" height="20" src="data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 24" fill="none" stroke="#007aff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H3v12h14V9h-3M10 15V2M6 6l4-4 4 4"/></svg>')}"/></button>`:'';
+      return `<div class="chat-row ${mine?'mine':''} ${grouped?'grouped':''} ${clusterEnd?'cluster-end':''} ${failed?'send-failed':''}">${speaker}<div class="bubble-wrap">${content}${accessory}${state.kind==='group'&&!mine?senderAvatar(from):''}</div>${receiptMarkup}</div>`;
+    }).join('')+(state.chatStatus==='dnd'?`<div class="focus-notice"><div><img class="focus-moon" alt="" width="16" height="16" src="data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="#8e8e93" d="M21 15.4A9 9 0 0 1 8.6 3a9.5 9.5 0 1 0 12.4 12.4Z"/></svg>')}"/> ${emojiText(state.chatName||'This contact')} has notifications silenced</div><button type="button" id="focus-notify-anyway">${state.focusNotifyAnyway?'Notified Anyway':'Notify Anyway'}</button></div>`:'');
     const log=$('chat-log');requestAnimationFrame(()=>{if(log.isConnected)log.scrollTop=log.scrollHeight;});
   }
   function renderAll(){syncControls();renderCards();renderPreview();}
@@ -207,6 +211,13 @@
   $('participant-list').addEventListener('click',e=>{const id=e.target.dataset.removeMember;if(!id)return;if(state.participants.length<=1){notify('Keep at least one group member.');return;}state.participants=state.participants.filter(p=>p.id!==id);state.messages.forEach(m=>{if(m.from===id)m.from=state.participants[0]?.id||'me';});renderAll();scheduleSave();});
   $('media-upload').addEventListener('change',async e=>{const file=e.target.files?.[0],msg=findMessage(mediaTarget);if(msg&&file)await attachMedia(msg,file);mediaTarget=null;});
   $('chat-log').addEventListener('click',e=>{const target=e.target.closest('[data-play-video]');if(!target)return;const src=mediaUrls.get(target.dataset.playVideo);if(!src)return;const frame=target.closest('.media-frame');if(!frame)return;const vid=document.createElement('video');vid.src=src;vid.controls=true;vid.autoplay=true;vid.playsInline=true;vid.style.cssText='max-width:245px;max-height:260px;display:block';frame.replaceChildren(vid);vid.play().catch(()=>{});});
+  $('chat-log').addEventListener('click',async e=>{
+    if(e.target.closest('#focus-notify-anyway')){state.focusNotifyAnyway=!state.focusNotifyAnyway;renderPreview();scheduleSave();return;}
+    const button=e.target.closest('[data-share-media]');if(!button)return;const message=findMessage(button.dataset.shareMedia);if(!message)return;
+    const blob=await readMedia(message.mediaId);if(!blob){notify('Attach a file first to save this media.');return;}
+    const extension=blob.type==='image/jpeg'?'jpg':blob.type==='image/png'?'png':blob.type==='video/webm'?'webm':'mp4';
+    saveFile(blob,`draftroom-${message.type==='image'?'photo':'video'}.${extension}`);
+  });
   $('app-imessage').addEventListener('click',()=>{document.querySelector('.composer-panel').scrollIntoView({behavior:'smooth',block:'start'});$('quick-text').focus({preventScroll:true});});
   $('reset-project').addEventListener('click',()=>{if(!confirm('Start a new conversation? This replaces the current browser draft. You can export a project first.'))return;state=defaults();renderAll();persist();notify('New conversation started.');});
 

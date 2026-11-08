@@ -50,6 +50,19 @@ const server=http.createServer(async(req,res)=>{
     await page.waitForSelector('[data-play-video]');await page.locator('[data-play-video]').click();await page.waitForSelector('.media-frame video');
     await page.waitForTimeout(450);await page.reload();await page.waitForSelector('.chat-bubble.media img');
     assert.equal(await page.locator('.chat-bubble.media img').count(),2);
+    assert.equal(await page.locator('.media-share').count(),2);
+    const mediaDownload=page.waitForEvent('download');await page.locator('.media-share').first().click();assert((await mediaDownload).suggestedFilename().startsWith('draftroom-photo.'));
+    for(const type of ['text','image','video']){
+      const card=page.locator(`.message-card.type-${type}`).first();await card.locator('[data-sender]').selectOption('me');await card.locator('[data-receipt]').selectOption('failed');
+    }
+    assert.equal(await page.locator('.receipt-failed').count(),3);assert.equal(await page.locator('.send-failure').count(),3);
+    assert.equal(await page.locator('.receipt-failed').first().evaluate(el=>getComputedStyle(el).color),'rgb(255, 59, 48)');
+    await page.locator('#quick-text').fill('A quiet delivery');await page.locator('#quick-send').click();
+    await page.locator('#receipt-style').selectOption('failed');assert((await page.locator('.receipt-failed').count())>=4);
+    await page.locator('#receipt-style').selectOption('delivered');await page.locator('#chat-status').selectOption('dnd');
+    assert((await page.locator('.focus-notice').textContent()).includes('has notifications silenced'));
+    assert.equal(await page.locator('.receipt').last().textContent(),'Delivered Quietly');
+    await page.locator('#focus-notify-anyway').click();assert.equal(await page.locator('.receipt').last().textContent(),'Delivered');await page.locator('#focus-notify-anyway').click();
     // Exercise all appearance combinations and both real PNG download paths.
     for(const version of ['18','27'])for(const theme of ['light','dark']){
       await page.locator(`[data-version="${version}"]`).click();await page.locator(`[data-theme="${theme}"]`).click();

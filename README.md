@@ -26,6 +26,8 @@ These are fictional screen controls. No real calls, microphone/camera access, no
 - One-to-one and group conversations, participants and contact photos
 - Text, photos, playable videos, timestamps, system events and typing indicators
 - Reorder, duplicate and delete messages; delivery/read receipts and Focus status
+- Blue media-save/share controls beside photos and videos; red Not Delivered labels and warning icons on outgoing text or media, including consecutive failures
+- Below-chat Focus notice with crescent, contact name and visual Notify Anyway control; Delivered Quietly receipts
 - Independent day/night previews, blue/green bubbles, wallpapers and glass tint
 - Browser draft persistence and portable JSON projects including media
 - Save image preview with PNG, JPG and image clipboard copying; a clean conversation crop, full screen or phone frame
