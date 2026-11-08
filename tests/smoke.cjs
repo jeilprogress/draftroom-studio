@@ -17,6 +17,12 @@ const server=http.createServer(async(req,res)=>{
     await page.goto(`http://127.0.0.1:${server.address().port}`);
     await page.waitForSelector('.chat-bubble');
     assert.equal(await page.locator('.message-card').count(),5);
+    await page.waitForSelector('#emoji-tray .ios-emoji');
+    await page.locator('#quick-text').fill('Hello 😭 🥹 ❤️ 👍🏽 👩🏽‍💻 🇵🇭');await page.locator('#quick-send').click();
+    assert.equal(await page.locator('.chat-bubble .ios-emoji').count(),6);
+    await page.locator('#quick-text').fill('😭');await page.locator('#quick-send').click();
+    assert.equal(await page.locator('.emoji-only.emoji-count-1').count(),1);
+    await page.locator('#emoji-tray button').first().click();assert.equal(await page.locator('#quick-text').inputValue(),'😭');await page.locator('#quick-text').fill('');
     await page.screenshot({path:path.join(root,'test-results/classic-desktop.png'),fullPage:true});
     await page.locator('#date-text').fill('Tuesday 10:30 AM');
     assert.equal(await page.locator('.chat-event.timestamp').textContent(),'Tuesday 10:30 AM');
@@ -60,11 +66,37 @@ const server=http.createServer(async(req,res)=>{
     assert.equal(await page.locator('.phone-screen').evaluate(el=>getComputedStyle(el).getPropertyValue('--outgoing').trim()),'#34c759');
     await page.locator('[data-kind="single"]').click();
     await page.locator('#contact-upload').setInputFiles({name:'avatar.png',mimeType:'image/png',buffer:photo});await page.waitForSelector('#phone-avatar img');
+    const avatar=await page.locator('#phone-avatar').boundingBox(),name=await page.locator('#phone-name').boundingBox();
+    assert(name.y>=avatar.y+avatar.height-2,'Liquid Glass name sits below the contact photo');
+    await page.locator('#export-phone').click();await page.waitForFunction(()=>!document.getElementById('save-image-png').disabled);
+    assert.equal(await page.locator('#image-layout').inputValue(),'conversation');
+    await page.screenshot({path:path.join(root,'test-results/save-picture-dialog.png'),fullPage:true});
+    for(const [button,extension] of [['#save-image-png','png'],['#save-image-jpg','jpg']]){
+      const pending=page.waitForEvent('download');await page.locator(button).click();const download=await pending;const target=path.join(root,`test-results/conversation.${extension}`);await download.saveAs(target);const bytes=await fs.readFile(target);
+      if(extension==='png'){assert.equal(bytes.subarray(1,4).toString(),'PNG');assert.equal(bytes.readUInt32BE(16),682);}
+      else{assert.equal(bytes.readUInt16BE(0),0xffd8);assert(bytes.length>10000);}
+    }
+    await context.grantPermissions(['clipboard-read','clipboard-write']);await page.locator('#copy-image').click();
+    await page.waitForFunction(()=>document.getElementById('image-action-status').textContent.startsWith('Image copied.'));
+    assert(await page.evaluate(async()=>{const items=await navigator.clipboard.read();return items.some(item=>item.types.includes('image/png'));}));
+    await page.locator('#image-layout').selectOption('phone');await page.waitForFunction(()=>!document.getElementById('save-image-png').disabled);
+    assert.equal(await page.locator('#image-preview').evaluate(img=>img.naturalWidth),710);
+    await page.keyboard.press('Escape');assert.equal(await page.locator('#image-dialog').evaluate(el=>el.open),false);
+    // A denied clipboard write gives a useful fallback without losing the picture.
+    await page.evaluate(()=>{navigator.clipboard.write=()=>Promise.reject(new DOMException('Denied','NotAllowedError'));});
+    await page.locator('#export-phone').click();await page.waitForFunction(()=>!document.getElementById('save-image-png').disabled);await page.locator('#copy-image').click();
+    await page.waitForFunction(()=>document.getElementById('image-action-status').textContent.includes('Clipboard access was blocked'));
+    await page.locator('#close-image-dialog').click();
+    await page.locator('[data-version="18"]').click();await page.locator('[data-theme="light"]').click();await page.locator('[data-color="blue"]').click();
+    await page.locator('#export-phone').click();await page.waitForFunction(()=>!document.getElementById('save-image-png').disabled);
+    const classicDownload=page.waitForEvent('download');await page.locator('#save-image-png').click();await(await classicDownload).saveAs(path.join(root,'test-results/classic-conversation.png'));await page.locator('#close-image-dialog').click();
     await page.setViewportSize({width:375,height:900});await page.screenshot({path:path.join(root,'test-results/mobile.png'),fullPage:true});
     assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+    await page.locator('#export-phone').click();await page.waitForFunction(()=>!document.getElementById('save-image-png').disabled);await page.screenshot({path:path.join(root,'test-results/mobile-save-picture.png'),fullPage:true});
+    assert(await page.locator('#image-dialog').evaluate(el=>el.scrollWidth<=el.clientWidth));await page.locator('#close-image-dialog').click();
     const projectDownload=page.waitForEvent('download');await page.locator('#export-project').click();const project=await projectDownload;const projectPath=path.join(root,'test-results/project.json');await project.saveAs(projectPath);
     const saved=JSON.parse(await fs.readFile(projectPath,'utf8'));assert.equal(Object.keys(saved.assets).length,2);
     page.on('dialog',dialog=>dialog.accept());await page.locator('#reset-project').click();await page.locator('#project-upload').setInputFiles(projectPath);await page.waitForSelector('#phone-avatar img');await page.waitForSelector('.chat-bubble.media img');
-    assert.deepEqual(errors,[]);console.log('Passed: messages, date, groups, photos, events, typing, image/video storage and playback, reload persistence, 8 PNG downloads, project round trip, mobile overflow.');
+    assert.deepEqual(errors,[]);console.log('Passed: messages, date, groups, photos, events, typing, media persistence/playback, 8 legacy PNG exports, Apple emoji sequences, stacked glass identity, clean PNG/JPG, real clipboard image and denied-permission fallback, project round trip, mobile overflow.');
   }finally{await browser.close();server.close();}
 })().catch(e=>{console.error(e);server.close();process.exitCode=1;});

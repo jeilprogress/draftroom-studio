@@ -5,6 +5,8 @@
   const EMOJIS = ['😭','🥹','🫶','❤️','🥰','😂','💗','🙄','😩','✨','💕'];
   const uid = () => `id_${Date.now().toString(36)}_${Math.random().toString(36).slice(2,8)}`;
   const escape = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const emojiText=s=>window.DraftroomEmoji?.render(s)??escape(s);
+  const bubbleTail='<svg xmlns="http://www.w3.org/2000/svg" width="14" height="19" viewBox="0 0 14 19"><path d="M0 0C1 9 4 14 14 17C8 20 2 18 0 14Z" fill="currentColor"/></svg>';
   const defaults = () => ({
     version:'18',theme:'light',color:'blue',kind:'single',chatName:'Mathine',contactPhoto:'',phoneTime:'9:41',
     dateText:'Today 9:41 AM',chatStatus:'normal',receipt:'delivered',wallpaper:'sky',wallpaperImage:'',glass:55,
@@ -91,7 +93,10 @@
   function renderPreview(){
     const shell=$('phone-shell');shell.className=`phone-shell is-ios${state.version} is-${state.theme} is-${state.color} ${state.kind==='group'?'is-group':''} ${state.chatStatus==='blocked'?'is-blocked':''} wallpaper-${state.wallpaper} ${state.wallpaperImage&&state.version==='27'?'has-custom-wallpaper':''}`;
     shell.style.setProperty('--custom-wallpaper',state.wallpaperImage?`url("${state.wallpaperImage}")`:'none');shell.style.setProperty('--glass-alpha',String((0.16+(Math.max(0,Math.min(100,Number(state.glass)||0))/100)*.55).toFixed(2)));
-    $('status-time').textContent=state.phoneTime||'9:41';$('phone-name').textContent=state.chatName||(state.kind==='group'?'Group Chat':'Contact');
+    const bubbleColors=getComputedStyle($('phone-screen'));
+    const tailImages=[false,true].map(mine=>`<img class="bubble-tail" alt="" aria-hidden="true" width="14" height="19" src="data:image/svg+xml,${encodeURIComponent(bubbleTail.replace('fill="currentColor"',`fill="${bubbleColors.getPropertyValue(mine?'--outgoing':'--incoming').trim()}"`))}" />`);
+    const tailFor=mine=>tailImages[Number(mine)];
+    $('status-time').textContent=state.phoneTime||'9:41';$('phone-name').innerHTML=emojiText(state.chatName||(state.kind==='group'?'Group Chat':'Contact'));
     $('phone-subtitle').textContent=state.chatStatus==='dnd'?'☾ Notifications silenced':'⌄';
     $('phone-subtitle').classList.toggle('dnd',state.chatStatus==='dnd');
     if(state.kind==='group'){
@@ -109,8 +114,8 @@
       const clusterEnd=!next||['timestamp','system','typing'].includes(next.type)||m.type==='typing'||effectiveSender(next.from)!==from;
       const speaker=state.kind==='group'&&!mine&&!grouped?`<div class="speaker-name">${escape(senderName(from))}</div>`:'';
       let content='';
-      if(m.type==='text')content=`<div class="chat-bubble">${escape(m.text||' ')}</div>`;
-      else if(m.type==='typing')content='<div class="chat-bubble typing-bubble"><i></i><i></i><i></i></div>';
+      if(m.type==='text'){const count=window.DraftroomEmoji?.count(m.text)||0;content=`<div class="chat-bubble ${count?`emoji-only emoji-count-${count}`:''}">${emojiText(m.text||' ')}${tailFor(mine)}</div>`;}
+      else if(m.type==='typing')content=`<div class="chat-bubble typing-bubble"><i></i><i></i><i></i>${tailFor(mine)}</div>`;
       else if(m.type==='image'||m.type==='video'){
         const src=m.type==='image'?mediaUrls.get(m.mediaId):(m.poster||'');
         content=`<div class="chat-bubble media"><div class="media-frame">${src?`<img src="${escape(src)}" alt="${m.type==='image'?'Photo':'Video still'}">`:`<div class="media-placeholder">${m.type==='image'?'Photo':'Video'}</div>`}${m.type==='video'?`<div class="media-play" ${m.mediaId?`data-play-video="${escape(m.mediaId)}" title="Play video" role="button" tabindex="0"`:''}><span>▶</span></div>`:''}</div></div>`;
@@ -169,8 +174,9 @@
   function sendQuick(){const text=$('quick-text').value.trim();if(!text){notify('Write something first.');return;}addMessage('text',{text,from:$('quick-sender').value});$('quick-text').value='';$('quick-text').focus();}
   $('quick-send').addEventListener('click',sendQuick);
   $('quick-text').addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){e.preventDefault();sendQuick();}});
-  $('emoji-tray').innerHTML=EMOJIS.map(e=>`<button type="button" aria-label="Insert ${e}">${e}</button>`).join('');
-  $('emoji-tray').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const t=$('quick-text'),start=t.selectionStart,end=t.selectionEnd;t.value=t.value.slice(0,start)+b.textContent+t.value.slice(end);t.focus();t.setSelectionRange(start+b.textContent.length,start+b.textContent.length);});
+  function renderEmojiTray(){$('emoji-tray').innerHTML=EMOJIS.map(e=>`<button type="button" data-emoji="${e}" aria-label="Insert ${e}">${emojiText(e)}</button>`).join('');}
+  renderEmojiTray();
+  $('emoji-tray').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const value=b.dataset.emoji,t=$('quick-text'),start=t.selectionStart,end=t.selectionEnd;t.value=t.value.slice(0,start)+value+t.value.slice(end);t.focus();t.setSelectionRange(start+value.length,start+value.length);});
   for(const [key,field,values] of [['version','version',['18','27']],['theme','theme',['light','dark']],['color','color',['blue','green']],['kind','kind',['single','group']]]){
     document.querySelectorAll(`[data-${key}]`).forEach(b=>b.addEventListener('click',()=>{
       const value=b.dataset[key];if(!values.includes(value))return;state[field]=value;
@@ -224,19 +230,19 @@
     }catch(err){console.error(err);notify('This file is not a valid Draftroom project.');}e.target.value='';
   });
 
-  async function pngCapture(mode){
-    if(typeof html2canvas!=='function'){notify('The PNG export library did not load. Please check your internet connection.');return;}
-    const button=mode==='phone'?$('download-phone'):$('export-full');button.disabled=true;const old=button.textContent;button.textContent='Rendering…';
+  async function captureCanvas(mode){
+    if(typeof html2canvas!=='function')throw Error('The image renderer did not load. Reload the page and try again.');
     let staging=null;
     try{
       // Take a static rendering: animated typing bubbles and video thumbnails remain visible in exports.
       // For full chat export the message list grows naturally instead of getting cut off at phone height.
+      await window.DraftroomEmoji?.ready;
       renderPreview();await new Promise(resolve=>setTimeout(resolve,130));
       const original=mode==='phone'?$('phone-shell'):$('phone-screen');
       staging=document.createElement('div');staging.className='capture-staging';staging.style.cssText='position:fixed;left:-20000px;top:0;z-index:-1;pointer-events:none;';
       const clone=original.cloneNode(true);
       // Preserve ancestor-dependent appearance and inherited wallpaper/tint variables.
-      if(mode==='full'){
+      if(mode!=='phone'){
         const context=document.createElement('div');context.className=$('phone-shell').className;
         context.style.cssText=$('phone-shell').style.cssText;
         context.style.width='341px';context.style.height='auto';context.style.border='0';context.style.padding='0';context.style.borderRadius='0';context.style.transform='none';context.style.boxShadow='none';
@@ -253,19 +259,69 @@
         const log=clone.querySelector('.chat-log');log.style.flex='none';log.style.overflow='visible';log.style.height='auto';log.style.minHeight='515px';
         const header=clone.querySelector('.chat-header');header.style.flex='none';
         const bottom=clone.querySelector('.phone-bottom');bottom.style.flex='none';
+        if(mode==='conversation'){
+          clone.classList.add('conversation-picture');clone.style.minHeight='0';
+          clone.querySelector('.statusbar').remove();clone.querySelector('.dynamic-island').remove();bottom.remove();
+          log.style.minHeight='0';
+        }
         // The wallpaper is absolutely positioned and automatically extends to the clone's full height.
       }
       const allImgs=[...clone.querySelectorAll('img')];await Promise.all(allImgs.map(img=>img.complete?Promise.resolve():new Promise(resolve=>{img.onload=resolve;img.onerror=resolve;setTimeout(resolve,2400);})));await document.fonts?.ready;
-      const canvas=await html2canvas(clone,{backgroundColor:null,scale:2,useCORS:true,logging:false,scrollX:0,scrollY:0,windowWidth:document.documentElement.clientWidth,windowHeight:document.documentElement.clientHeight});
-      const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/png'));if(!blob)throw Error('Canvas export failed');
-      saveFile(blob,`draftroom-${filenameBase()}-${mode==='phone'?'phone':'full-chat'}.png`);notify('Your conversation PNG is ready.');
-    }catch(err){console.error(err);notify('PNG rendering failed. Try shorter media or a different browser.');}
-    finally{staging?.remove();button.disabled=false;button.textContent=old;}
+      return await html2canvas(clone,{backgroundColor:null,scale:2,useCORS:true,logging:false,scrollX:0,scrollY:0,windowWidth:document.documentElement.clientWidth,windowHeight:document.documentElement.clientHeight});
+    }finally{staging?.remove();}
+  }
+  function canvasBlob(canvas,type='image/png'){
+    return new Promise((resolve,reject)=>canvas.toBlob(blob=>blob?resolve(blob):reject(Error('Could not create this image.')),type,.95));
+  }
+  async function pngCapture(mode){
+    const button=mode==='phone'?$('download-phone'):$('export-full'),old=button.textContent;button.disabled=true;button.textContent='Rendering…';
+    try{const canvas=await captureCanvas(mode);saveFile(await canvasBlob(canvas),`draftroom-${filenameBase()}-${mode==='phone'?'phone':'full-chat'}.png`);notify('Your conversation PNG is ready.');}
+    catch(err){console.error(err);notify('Image rendering failed. Reload the page and try again.');}
+    finally{button.disabled=false;button.textContent=old;}
   }
   $('export-full').addEventListener('click',()=>pngCapture('full'));
   $('download-phone').addEventListener('click',()=>pngCapture('phone'));
-  $('export-phone').addEventListener('click',()=>pngCapture('phone'));
+  const imageDialog=$('image-dialog');let imageCanvas=null,imageUrl=null,imageGeneration=0;
+  const imageButtons=[$('save-image-png'),$('save-image-jpg'),$('copy-image')];
+  async function prepareImage(){
+    const generation=++imageGeneration;imageCanvas=null;imageButtons.forEach(b=>b.disabled=true);
+    $('image-preview').hidden=true;$('image-preview-status').hidden=false;$('image-preview-status').textContent='Preparing image…';$('image-action-status').textContent='';
+    try{
+      const canvas=await captureCanvas($('image-layout').value),blob=await canvasBlob(canvas);
+      if(generation!==imageGeneration||!imageDialog.open)return;
+      imageCanvas=canvas;if(imageUrl)URL.revokeObjectURL(imageUrl);imageUrl=URL.createObjectURL(blob);
+      $('image-preview').src=imageUrl;$('image-preview').hidden=false;$('image-preview-status').hidden=true;
+      imageButtons.forEach(b=>b.disabled=false);
+      if(!navigator.clipboard?.write||typeof ClipboardItem==='undefined'){$('copy-image').disabled=true;$('image-action-status').textContent='Use Save PNG or touch and hold the picture to save it on this browser.';}
+    }catch(err){if(generation===imageGeneration){$('image-preview-status').textContent='Could not prepare the image. Try a different layout or reload the page.';}}
+  }
+  $('export-phone').innerHTML='Save image <span aria-hidden="true">↗</span>';
+  $('export-phone').addEventListener('click',()=>{$('image-layout').value='conversation';imageDialog.showModal();prepareImage();});
+  $('close-image-dialog').addEventListener('click',()=>imageDialog.close());
+  imageDialog.addEventListener('close',()=>{imageGeneration++;imageCanvas=null;$('image-preview').removeAttribute('src');if(imageUrl)URL.revokeObjectURL(imageUrl);imageUrl=null;});
+  $('image-layout').addEventListener('change',prepareImage);
+  async function saveConversationImage(type){
+    if(!imageCanvas)return;
+    try{
+      let canvas=imageCanvas;
+      if(type==='image/jpeg'){
+        const opaque=document.createElement('canvas');opaque.width=canvas.width;opaque.height=canvas.height;
+        const context=opaque.getContext('2d');context.fillStyle=state.theme==='dark'?'#000':'#fff';context.fillRect(0,0,opaque.width,opaque.height);context.drawImage(canvas,0,0);canvas=opaque;
+      }
+      saveFile(await canvasBlob(canvas,type),`draftroom-${filenameBase()}-${$('image-layout').value}.${type==='image/jpeg'?'jpg':'png'}`);
+      $('image-action-status').textContent=type==='image/jpeg'?'JPG saved.':'PNG saved.';
+    }catch{$('image-action-status').textContent='Could not save this image. Try right-clicking or holding the preview.';}
+  }
+  $('save-image-png').addEventListener('click',()=>saveConversationImage('image/png'));
+  $('save-image-jpg').addEventListener('click',()=>saveConversationImage('image/jpeg'));
+  $('copy-image').addEventListener('click',()=>{
+    if(!imageCanvas)return;
+    try{
+      // Start the clipboard operation inside the click, including browsers requiring user activation.
+      navigator.clipboard.write([new ClipboardItem({'image/png':canvasBlob(imageCanvas)})]).then(()=>{$('image-action-status').textContent='Image copied. Paste it into your document or chat.';}).catch(()=>{$('image-action-status').textContent='Clipboard access was blocked. Right-click the picture to copy it, or save PNG.';});
+    }catch{$('image-action-status').textContent='Copy is unavailable here. Right-click the picture or save PNG.';}
+  });
 
-  async function init(){mediaDB=await openDB();renderAll();await loadMedia();}
+  async function init(){mediaDB=await openDB();renderAll();await loadMedia();await window.DraftroomEmoji?.ready;renderEmojiTray();renderPreview();}
   init();
 })();

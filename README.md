@@ -11,14 +11,18 @@ A private, static conversation studio for writers. A calm black/deep-navy worksp
 - Reorder, duplicate and delete messages; delivery/read receipts and Focus status
 - Independent day/night previews, blue/green bubbles, wallpapers and glass tint
 - Browser draft persistence and portable JSON projects including media
-- Phone and full conversation PNG export with a local html2canvas 1.4.1 copy
+- Save image preview with PNG, JPG and image clipboard copying; a clean conversation crop, full screen or phone frame
+- Existing phone and full conversation PNG shortcuts, with a local html2canvas 1.4.1 copy
+- Consistent Apple emoji artwork in previews and saved images, including skin tones, flags and joined sequences
 - Responsive layout, keyboard controls and reduced-motion support
 
 ## Design and fonts
 
 Classic uses solid blue/green and neutral bubbles, compact contact navigation and native-style text metrics. Liquid Glass uses floating translucent navigation and composer controls over muted wallpaper, preserving readable bubbles. The iOS 27 option is an original web approximation, not an official Apple implementation or a claim of pixel-perfect fidelity. See [Apple's design overview](https://www.apple.com/newsroom/2025/06/apple-introduces-a-delightful-and-elegant-new-software-design/).
 
-The system font stack uses -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica and Arial. No proprietary font files or Apple emoji artwork are bundled. Text and emoji appearance depends on the operating system.
+The system font stack uses -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica and Arial. No proprietary font files are bundled. Apple emoji artwork is supplied as a local image sheet from emoji-datasource-apple 16.0.0; Unicode stays unchanged in editable text and saved projects. Unmapped emoji and image-loading failures fall back to the device's native rendering. See vendor/emoji/NOTICE.md for artwork rights and the separate MIT data license.
+
+The Liquid Glass contact header follows a centered photo above a separate name capsule. Bubble tails use curved SVG paths that also render in saved images. Choose **Save image** in the top bar for a picture preview: **Conversation only** removes the device, status bar and input field while keeping the contact header and every message. **Save PNG**, **Save JPG** and **Copy image** use that same picture. Right-click or touch and hold the preview for the browser's image actions. Clipboard writing requires a supporting browser and permission; denied access leaves downloads available.
 
 ## Privacy and storage
 
@@ -34,7 +38,7 @@ npx playwright install chromium
 npm test
 ```
 
-The smoke test starts a local server and checks message creation, dates, groups, photo and video uploads/playback, persistence, all four version/theme combinations, eight real PNG downloads, JSON round trips, and mobile overflow. Screenshots and exports go to ignored test-results/.
+The smoke test starts a local server and checks message creation, dates, groups, photo and video uploads/playback, persistence, all four version/theme combinations, eight legacy PNG downloads, clean PNG/JPG images, real clipboard copying and denied-permission fallback, emoji sequences, stacked contact identity, JSON round trips, and mobile overflow. Screenshots and exports go to ignored test-results/.
 
 ## Third-party license
 
