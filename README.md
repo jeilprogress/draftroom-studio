@@ -7,7 +7,9 @@ A private, static creative workspace for writers. A calm black/deep-navy home sc
 [Open Lock Screen](https://jeilprogress.github.io/draftroom-studio/lockscreen.html), the third studio on the home screen. Messages and Calls code and drafts are kept separate.
 
 - Classic and Liquid Glass-inspired notification cards, wallpaper controls and clock materials
-- Nine clock interpretations, with rounded SVG numerals for the standard/rounded/thin/bold/condensed/outline styles and local fonts for the remaining styles, three numeral sets, font weight/color/size controls, glass opacity and vertical stretching with a draggable or keyboard-adjustable resize handle
+- Independent Light/Dark notification appearance, including grouped cards, stack layers, Focus summaries, music cards and exported images
+- Liquid Display vector numerals with layered translucency and clipped surface highlights; Classic retains its rounded numeric outlines
+- Ten clock interpretations, with rounded SVG numerals for the standard/rounded/thin/bold/condensed/outline styles and local fonts for the remaining styles, three numeral sets, font weight/color/size controls, glass opacity and vertical stretching with a draggable or keyboard-adjustable resize handle
 - Editable date/inline widget line and 12 widget types: weather, temperature, battery, activity rings, calendar, alarm, world clock, reminders, stocks, sunrise, moon and custom; a four-space row that can sit below the clock or near the bottom
 - Six original wallpaper presets, photo uploads, zoom/position/dim controls and an optional transparent foreground upload for layered depth
 - **49 bundled app icons** (39 App Store entries and 10 system-app illustrations), plus live App Store search and custom app/icon uploads
