@@ -1,6 +1,22 @@
 # Draftroom · iMessage Studio
 
-A private, static creative workspace for writers. A calm black/deep-navy home screen opens independent Messages, Calls and Lock Screen studios, each with iOS 18 Classic and iOS 27 Liquid Glass-inspired previews.
+A private, static creative workspace for writers. A calm black/deep-navy home screen opens independent Messages, Calls, Lock Screen and X studios. The iOS studios offer Classic and Liquid Glass-inspired previews.
+
+## X / Twitter studio
+
+[Open X Studio](https://jeilprogress.github.io/draftroom-studio/x.html), the fourth home-screen tile. It is a fictional profile/post creator with a reusable character library; it does not connect to or publish on X.
+
+**Characters:** Save a display name, username, bio, location, link, joined label, profile photo, header and following/follower counts. Blue verification and protected-account flags are independent, so either, both or neither can be displayed. Own-profile, Following, Follow and Requested button states, Follows you, optional Followed by text and a pinned post are editable. Profile photos are cropped square and headers to 3:1. New profiles become available in author selectors after Save character; saved profile edits update every linked post. The active unsaved character draft also survives reload.
+
+**Posts and conversations:** Choose a saved author to create a post, reply, quote post or repost. Replies and quotes can reference existing replies and quotes as well as original posts. References remain linked, circular references are rejected, and deleted targets show unavailable-post placeholders. Post detail, profile, timeline and conversation-thread layouts are available in Light, Dim and Lights out appearances. Profiles can be exported with or without their posts for character introductions.
+
+**Media and story details:** Up to four mixed photos/videos per post, single-image aspect choices, attachment reorder/remove, video playback and editable video-duration labels. Video stills are used for exports. Edit detail date/time, relative timeline time, replies/reposts/likes/bookmarks/views, and visual liked/reposted/bookmarked states. Pinned posts, reply-permission labels, translation labels, edited indicators, sensitive-media covers, and polls with two to four choices and editable vote results are included. Links, @mentions and hashtags are styled in post text and bios.
+
+**Storage and pictures:** The X studio has its own IndexedDB draft and media storage, plus a localStorage fallback when IndexedDB is unavailable; fallback media stays in memory until a portable project is saved. Save project includes characters, posts, active drafts and original media; importing replaces only the X draft. PNG, JPG and image clipboard export support full-content crops, visible phone screenshots and phone frames. No proprietary X font is bundled. Counts, verification, privacy and interaction states are fictional editable visuals, not live account state.
+
+Research references: [X profile customization](https://help.x.com/en/managing-your-account/how-to-customize-your-profile), [post types](https://help.x.com/en/using-x/types-of-posts), [mixed media](https://help.x.com/en/using-x/how-to-post), [replies](https://help.x.com/en/using-x/mentions-and-replies) and [reposts](https://help.x.com/en/using-x/how-to-repost). Screenshot layout references were supplied by the user; their personal images are not bundled with the site.
+
+Run `npm run test:x` for character save/reuse, badge/follow/count states, uploads, linked replies/quotes/reposts and cycle prevention, four-photo/mixed-video grids, playback/reload persistence, polls, twelve theme/layout PNG exports, JPG/clipboard/screen/frame options, project round trips, mobile layout and isolation from the other three studios. `npm test` runs all four studios.
 
 ## Lock Screen studio
 
