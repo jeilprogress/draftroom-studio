@@ -1,6 +1,28 @@
 # Draftroom · iMessage Studio
 
-A private, static creative workspace for writers. A calm black/deep-navy home screen opens independent Messages and Calls studios, each with iOS 18 Classic and iOS 27 Liquid Glass-inspired previews.
+A private, static creative workspace for writers. A calm black/deep-navy home screen opens independent Messages, Calls and Lock Screen studios, each with iOS 18 Classic and iOS 27 Liquid Glass-inspired previews.
+
+## Lock Screen studio
+
+[Open Lock Screen](https://jeilprogress.github.io/draftroom-studio/lockscreen.html), the third studio on the home screen. Messages and Calls code and drafts are kept separate.
+
+- Classic and Liquid Glass-inspired notification cards, wallpaper controls and clock materials
+- Nine system-font clock interpretations, three numeral sets, font weight/color/size controls, glass opacity and vertical stretching with a draggable or keyboard-adjustable resize handle
+- Editable date/inline widget line and 12 widget types: weather, temperature, battery, activity rings, calendar, alarm, world clock, reminders, stocks, sunrise, moon and custom; a four-space row that can sit below the clock or near the bottom
+- Six original wallpaper presets, photo uploads, zoom/position/dim controls and an optional transparent foreground upload for layered depth
+- **48 bundled app icons** (38 App Store entries and 10 system-app illustrations), plus live App Store search and custom app/icon uploads
+- App-specific presets for Messages/group texts/media, missed calls, FaceTime, X posts/replies/quotes, Instagram DMs/story mentions/likes, Facebook interactions and Discord messages; arbitrary editable notifications for any other app
+- Sender/title/subtitle/body/time/count, Time Sensitive labels, sender photos and thumbnails; duplicate, reorder and delete controls
+- List, grouped Stack and Count layouts, expandable groups, notification privacy previews and optional Notification Center title
+- Do Not Disturb, Sleep, Work, Personal, Driving or custom Focus, including an expandable silenced-notification summary and dimmed Always-On appearance
+- Carrier/network/battery/charging, lock symbol, Dynamic Island/notch, selectable and clickable bottom shortcuts, and a visual Now Playing card
+- Independent browser draft, portable JSON backup/import, screen or phone-frame PNG/JPG and clipboard image copying
+
+Clock styles and glass are web approximations using local fonts; they do not bundle Apple's fonts, reproduce native optical refraction or automatically segment a wallpaper subject. The transparent foreground upload provides the depth layer. The phone picture captures the visible part of the notification list; scroll the preview to choose which cards are visible. Widgets and notifications are fictional editable values, not live account data or installed apps. App Store search sends only the typed app query to Apple; selected remote icons are embedded locally when available. See `vendor/lock-apps/NOTICE.md` for artwork provenance.
+
+Design references: [Apple Lock Screen customization](https://support.apple.com/en-am/guide/iphone/-iph4d0e6c351/ios), [Apple Lock Screen features and notification views](https://support.apple.com/en-ph/guide/iphone/-iphcd5c65ccf/ios), and [Apple Search API](https://developer.apple.com/library/archive/documentation/AudioVideo/Conceptual/iTuneSearchAPI/index.html).
+
+Run `npm run test:lockscreen` for its browser checks. Set `LOCKSCREEN_LIVE_SEARCH=1` to additionally verify Apple's live JSONP search and icon embedding; the normal test deterministically checks that integration at its network boundary. The test covers clocks, notification templates/grouping/privacy, all widget types and capacity, Focus, music/shortcuts, uploads/depth, persistence/project round trips, real image downloads and clipboard copying, mobile layout and preservation of the other drafts. It also checks visible clock pixels in the Liquid Glass PNG.
 
 [Open Draftroom](https://jeilprogress.github.io/draftroom-studio/). GitHub Pages publishes the configured repository source; no application build is required. The home page is `index.html`, Messages is `messages.html`, and Calls is `calls.html`. Keep these pages with their adjacent CSS/JS files, `.nojekyll`, and `vendor/`.
 

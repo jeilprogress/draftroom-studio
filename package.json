@@ -1,6 +1,6 @@
 {
   "name": "draftroom-studio",
   "private": true,
-  "scripts": { "test": "node tests/smoke.cjs && node tests/calls.cjs", "test:messages": "node tests/smoke.cjs", "test:calls": "node tests/calls.cjs" },
+  "scripts": { "test": "node tests/smoke.cjs && node tests/calls.cjs && node tests/lockscreen.cjs", "test:messages": "node tests/smoke.cjs", "test:calls": "node tests/calls.cjs", "test:lockscreen": "node tests/lockscreen.cjs" },
   "devDependencies": { "playwright": "1.65.0" }
 }
