@@ -54,7 +54,7 @@
   function eventText(kind){const who=state.kind==='group'?(state.participants[0]?.name||'Someone'):(state.chatName||'Someone');const other=state.kind==='group'?(state.participants[1]?.name||'someone'):'someone';return {joined:`${who} joined the conversation.`,left:`${who} left the conversation.`,removed:`${who} removed ${other} from the conversation.`,dnd:`${who} has notifications silenced.`,blocked:'You cannot send messages to this conversation.',unsent:`${who} unsent a message.`}[kind]||'';}
 
   function syncControls(){
-    document.querySelectorAll('[data-version]').forEach(b=>b.classList.toggle('selected',b.dataset.version===state.version));
+    document.querySelectorAll('[data-version]').forEach(b=>{b.classList.toggle('selected',b.dataset.version===state.version);b.setAttribute('aria-pressed',String(b.dataset.version===state.version));});
     document.querySelectorAll('[data-theme]').forEach(b=>b.classList.toggle('selected',b.dataset.theme===state.theme));
     document.querySelectorAll('[data-color]').forEach(b=>b.classList.toggle('selected',b.dataset.color===state.color));
     document.querySelectorAll('[data-kind]').forEach(b=>b.classList.toggle('selected',b.dataset.kind===state.kind));
@@ -106,6 +106,7 @@
       const from=effectiveSender(m.from),mine=from==='me';
       const previous=state.messages[i-1],next=state.messages[i+1];
       const grouped=Boolean(previous&&effectiveSender(previous.from)===from&&!['timestamp','system'].includes(previous.type)&&previous.type!=='typing');
+      const clusterEnd=!next||['timestamp','system','typing'].includes(next.type)||m.type==='typing'||effectiveSender(next.from)!==from;
       const speaker=state.kind==='group'&&!mine&&!grouped?`<div class="speaker-name">${escape(senderName(from))}</div>`:'';
       let content='';
       if(m.type==='text')content=`<div class="chat-bubble">${escape(m.text||' ')}</div>`;
@@ -118,7 +119,7 @@
       const receipt=m.receipt==='default'||!m.receipt?state.receipt:m.receipt;
       const receiptText={delivered:'Delivered',read:'Read',failed:'Not Delivered',none:''}[receipt]||'';
       const receiptMarkup=mine&&!hasFollowingMine&&m.type!=='typing'&&receiptText?`<div class="receipt">${receiptText}</div>`:'';
-      return `<div class="chat-row ${mine?'mine':''} ${grouped?'grouped':''}">${speaker}<div class="bubble-wrap">${content}${state.kind==='group'&&!mine?senderAvatar(from):''}</div>${receiptMarkup}</div>`;
+      return `<div class="chat-row ${mine?'mine':''} ${grouped?'grouped':''} ${clusterEnd?'cluster-end':''}">${speaker}<div class="bubble-wrap">${content}${state.kind==='group'&&!mine?senderAvatar(from):''}</div>${receiptMarkup}</div>`;
     }).join('');
     const log=$('chat-log');requestAnimationFrame(()=>{if(log.isConnected)log.scrollTop=log.scrollHeight;});
   }
@@ -178,7 +179,13 @@
     }));
   }
   const bindValue=(id,key)=>$(id).addEventListener('input',e=>{state[key]=e.target.value;if(id==='chat-name'){$('contact-avatar-preview').textContent=(state.chatName||'?')[0].toUpperCase();renderQuickSender();}renderPreview();scheduleSave();});
-  bindValue('chat-name','chatName');bindValue('phone-time','phoneTime');bindValue('date-text','dateText');
+  bindValue('chat-name','chatName');bindValue('phone-time','phoneTime');
+  $('date-text').addEventListener('input',e=>{
+    const first=state.messages.find(m=>m.type==='timestamp'&&m.text===state.dateText);
+    state.dateText=e.target.value;
+    if(first){first.text=state.dateText;const input=document.querySelector(`[data-msg-text="${first.id}"]`);if(input)input.value=first.text;}
+    renderPreview();scheduleSave();
+  });
   for(const [id,key] of [['chat-status','chatStatus'],['receipt-style','receipt'],['wallpaper','wallpaper']])$(id).addEventListener('change',e=>{state[key]=e.target.value;renderPreview();scheduleSave();});
   $('contact-upload').addEventListener('change',async e=>{const f=e.target.files?.[0];if(!f)return;try{state.contactPhoto=await resizedImage(f,260);syncControls();renderPreview();scheduleSave();}catch{notify('That contact photo could not be loaded.');}});
   const contactDrop=$('contact-drop');contactDrop.addEventListener('dragover',e=>{e.preventDefault();contactDrop.style.background='#e9f3ea';});contactDrop.addEventListener('dragleave',()=>contactDrop.style.background='');contactDrop.addEventListener('drop',async e=>{e.preventDefault();contactDrop.style.background='';const f=e.dataTransfer.files?.[0];if(!f?.type.startsWith('image/'))return;try{state.contactPhoto=await resizedImage(f,260);syncControls();renderPreview();scheduleSave();}catch{notify('Cannot use that contact photo.');}});
@@ -227,9 +234,18 @@
       renderPreview();await new Promise(resolve=>setTimeout(resolve,130));
       const original=mode==='phone'?$('phone-shell'):$('phone-screen');
       staging=document.createElement('div');staging.className='capture-staging';staging.style.cssText='position:fixed;left:-20000px;top:0;z-index:-1;pointer-events:none;';
-      const clone=original.cloneNode(true);staging.append(clone);document.body.append(staging);
+      const clone=original.cloneNode(true);
+      // Preserve ancestor-dependent appearance and inherited wallpaper/tint variables.
+      if(mode==='full'){
+        const context=document.createElement('div');context.className=$('phone-shell').className;
+        context.style.cssText=$('phone-shell').style.cssText;
+        context.style.width='341px';context.style.height='auto';context.style.border='0';context.style.padding='0';context.style.borderRadius='0';context.style.transform='none';context.style.boxShadow='none';
+        context.append(clone);staging.append(context);
+      }else staging.append(clone);
+      document.body.append(staging);
       if(mode==='phone'){
         clone.style.transform='none';clone.style.boxShadow='none';
+        const log=clone.querySelector('.chat-log');log.scrollTop=$('chat-log').scrollTop;
         staging.style.width='355px';staging.style.height='710px';
       }else{
         staging.style.width='341px';clone.style.width='341px';clone.style.height='auto';clone.style.minHeight='690px';clone.style.borderRadius='0';clone.style.overflow='visible';

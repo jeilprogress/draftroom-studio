@@ -3,10 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#f4f3f0" />
+  <meta name="theme-color" content="#080d18" />
   <meta name="description" content="A private, browser-based fictional iMessage conversation creator for writers." />
   <title>Draftroom · iMessage Studio</title>
   <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="studio.css" />
 </head>
 <body>
   <div class="site">
@@ -20,7 +21,7 @@
       <aside class="settings-panel panel" aria-label="Conversation settings">
         <div class="panel-scroll settings-scroll">
           <div class="eyebrow">01 / BUILD YOUR WORLD</div>
-          <h1>Every chat<br>tells a <em>story.</em></h1>
+          <h1>A little space<br>for your <em>story.</em></h1>
           <p class="intro">Set the scene. The conversation on the right updates while you write.</p>
 
           <section class="form-section"><div class="section-head"><h2>iOS interface</h2><span class="section-index">A</span></div>
@@ -62,7 +63,7 @@
       </main>
 
       <section class="preview-panel" aria-label="Live conversation preview"><div class="preview-top"><div><div class="eyebrow">03 / THE FINAL LOOK</div><h2>Live preview <span class="live-indicator"></span></h2></div><div class="preview-actions"><button class="button soft small" id="export-full">Full chat PNG</button><button class="button soft small" id="download-phone">Phone PNG</button></div></div>
-        <div class="preview-stage"><div id="phone-shell" class="phone-shell is-ios18"><div id="phone-screen" class="phone-screen"><div class="dynamic-island" aria-hidden="true"></div><div class="statusbar"><div id="status-time">9:41</div><div class="status-icons"><svg viewBox="0 0 65 18" width="65" height="18" fill="currentColor" aria-hidden="true"><path d="M2 13h4v3H2zM8 10h4v6H8zM14 7h4v9h-4zM20 3h4v13h-4z"/><path d="M32 7c4-4 10-4 14 0l-2 2c-3-2.6-7-2.6-10 0zM36 11c2-2 5-2 7 0l-3.5 4z"/><rect x="50" y="4" rx="3" width="13" height="11" fill="none" stroke="currentColor" stroke-width="1.6"/><rect x="52" y="6" rx="1.5" width="9" height="7"/><rect x="64" y="7.5" width="2" height="4" rx="1"/></svg></div></div><div class="chat-header"><div class="nav-left"><span class="back-arrow">‹</span><span class="unread-count">12</span></div><div id="phone-identity" class="phone-identity"><div id="phone-avatar" class="phone-avatar">M</div><div id="phone-name" class="phone-name">Mathine</div><div id="phone-subtitle" class="phone-subtitle">⌄</div></div><div class="nav-right" title="FaceTime video"><svg width="25" height="19" viewBox="0 0 26 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="1" y="3" width="16" height="14" rx="4"/><path d="M18 7l7-4v14l-7-4"/></svg></div></div><div id="chat-wallpaper" class="chat-wallpaper"></div><div id="chat-log" class="chat-log" aria-live="polite"></div><div class="phone-bottom"><div id="blocked-notice" class="blocked-notice" hidden>You cannot send messages to this conversation.</div><div class="compose-bar"><span class="compose-plus">+</span><div class="compose-field">iMessage <span class="mic-icon">♩</span></div></div><div class="home-indicator"></div></div></div></div></div>
+        <div class="preview-stage"><div id="phone-shell" class="phone-shell is-ios18"><div id="phone-screen" class="phone-screen"><div class="dynamic-island" aria-hidden="true"></div><div class="statusbar"><div id="status-time">9:41</div><div class="status-icons"><svg viewBox="0 0 65 18" width="65" height="18" fill="currentColor" aria-hidden="true"><path d="M2 13h4v3H2zM8 10h4v6H8zM14 7h4v9h-4zM20 3h4v13h-4z"/><path d="M32 7c4-4 10-4 14 0l-2 2c-3-2.6-7-2.6-10 0zM36 11c2-2 5-2 7 0l-3.5 4z"/><rect x="50" y="4" rx="3" width="13" height="11" fill="none" stroke="currentColor" stroke-width="1.6"/><rect x="52" y="6" rx="1.5" width="9" height="7"/><rect x="64" y="7.5" width="2" height="4" rx="1"/></svg></div></div><div class="chat-header"><div class="nav-left"><span class="back-arrow">‹</span><span class="unread-count">12</span></div><div id="phone-identity" class="phone-identity"><div id="phone-avatar" class="phone-avatar">M</div><div id="phone-name" class="phone-name">Mathine</div><div id="phone-subtitle" class="phone-subtitle">⌄</div></div><div class="nav-right" title="FaceTime video"><svg width="25" height="19" viewBox="0 0 26 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="1" y="3" width="16" height="14" rx="4"/><path d="M18 7l7-4v14l-7-4"/></svg></div></div><div id="chat-wallpaper" class="chat-wallpaper"></div><div id="chat-log" class="chat-log" aria-live="polite"></div><div class="phone-bottom"><div id="blocked-notice" class="blocked-notice" hidden>You cannot send messages to this conversation.</div><div class="compose-bar"><span class="compose-plus">+</span><div class="compose-field">iMessage <span class="mic-icon" aria-hidden="true"><svg viewBox="0 0 16 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="5" y="2" width="6" height="12" rx="3"/><path d="M2 10v2a6 6 0 0 0 12 0v-2M8 18v4M5 22h6"/></svg></span></div></div><div class="home-indicator"></div></div></div></div></div>
         <div class="preview-caption"><span class="preview-caption-dot"></span> A fictional conversation, ready for your story.</div>
       </section>
 
@@ -70,7 +71,7 @@
     </div>
     <div id="toast" class="toast" role="status" aria-live="polite"></div><input type="file" id="project-upload" accept=".json,application/json" hidden /><input type="file" id="media-upload" accept="image/*,video/*" hidden />
   </div>
-  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" defer></script>
+  <script src="vendor/html2canvas.min.js" defer></script>
   <script src="app.js" defer></script>
 </body>
 </html>
