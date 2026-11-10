@@ -2,13 +2,14 @@
   "name": "draftroom-studio",
   "private": true,
   "scripts": {
-    "test": "node tests/smoke.cjs && node tests/calls.cjs && node tests/lockscreen.cjs && node tests/x.cjs && node tests/au.cjs && node tests/master.cjs",
+    "test": "node tests/smoke.cjs && node tests/calls.cjs && node tests/lockscreen.cjs && node tests/x.cjs && node tests/au.cjs && node tests/master.cjs && node tests/accuracy.cjs",
     "test:messages": "node tests/smoke.cjs",
     "test:calls": "node tests/calls.cjs",
     "test:lockscreen": "node tests/lockscreen.cjs",
     "test:x": "node tests/x.cjs",
     "test:au": "node tests/au.cjs",
-    "test:master": "node tests/master.cjs"
+    "test:master": "node tests/master.cjs",
+    "test:accuracy": "node tests/accuracy.cjs"
   },
   "devDependencies": {
     "playwright": "1.65.0"

@@ -135,3 +135,5 @@ The Messages smoke test checks message creation, dates, groups, photo and video 
 ## Third-party license
 
 vendor/html2canvas.min.js is html2canvas 1.4.1, Copyright © 2022 Niklas von Hertzen, distributed under the MIT license; see vendor/LICENSE.html2canvas.
+
+The visual accuracy suite (`npm run test:accuracy`) checks Instagram owner/visitor profile placement, vector controls and chevrons, green Following, Story perspectives and Close Friends placement, exports, and compact attributed Messages Tapbacks with add/change/remove persistence. The Messages Back button has no notification count and returns to the studio dashboard. Instagram loads its own icon set; X retains its existing interface. All review fixtures use neutral names and synthetic media.
