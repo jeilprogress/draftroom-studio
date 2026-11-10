@@ -10,11 +10,11 @@ const server=http.createServer(async(req,res)=>{
 (async()=>{
   await fs.mkdir(path.join(root,'test-results'),{recursive:true});
   await new Promise(r=>server.listen(0,'127.0.0.1',r));
-  const browser=await chromium.launch({headless:true});
+  const browser=await chromium.launch({headless:true,channel:process.env.DRAFTROOM_BROWSER||undefined});
   try{
     const context=await browser.newContext({viewport:{width:1440,height:1000},acceptDownloads:true});
     const page=await context.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));
-    await page.goto(`http://127.0.0.1:${server.address().port}/messages.html`);
+    await page.goto(`http://127.0.0.1:${server.address().port}/messages.html`);await page.locator('#message-tools-toggle').click();
     await page.waitForSelector('.chat-bubble');
     assert.equal(await page.locator('.message-card').count(),5);
     await page.waitForSelector('#emoji-tray .ios-emoji');
@@ -48,7 +48,7 @@ const server=http.createServer(async(req,res)=>{
     });
     const videoChooser=page.waitForEvent('filechooser');await page.locator('[data-add="video"]').click();await(await videoChooser).setFiles({name:'clip.webm',mimeType:'video/webm',buffer:Buffer.from(video)});
     await page.waitForSelector('[data-play-video]');await page.locator('[data-play-video]').click();await page.waitForSelector('.media-frame video');
-    await page.waitForTimeout(450);await page.reload();await page.waitForSelector('.chat-bubble.media img');
+    await page.waitForTimeout(450);await page.reload();await page.waitForSelector('.chat-bubble.media');await page.waitForFunction(()=>document.querySelectorAll('.chat-bubble.media img').length===2);
     assert.equal(await page.locator('.chat-bubble.media img').count(),2);
     assert.equal(await page.locator('.media-share').count(),2);
     const mediaDownload=page.waitForEvent('download');await page.locator('.media-share').first().click();assert((await mediaDownload).suggestedFilename().startsWith('draftroom-photo.'));

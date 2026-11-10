@@ -1,6 +1,21 @@
-# Draftroom · iMessage Studio
+# Draftroom · AU Studio
 
-A private, static creative workspace for writers. A calm black/deep-navy home screen opens independent Messages, Calls, Lock Screen and X studios. The iOS studios offer Classic and Liquid Glass-inspired previews.
+A private, static creative workspace for writers. A calm black/deep-navy home screen opens independent Messages, Calls, Lock Screen and X studios. Messages and Calls retain Classic and Liquid Glass-inspired previews; Lock Screen now uses iOS 18 Classic only.
+
+
+## AU projects and the shared cast
+
+The opening page is an AU project library: name a story and choose **Start AU**, add its characters, then continue to the existing studio dashboard. The dashboard and every studio show the active AU; **Switch AU** returns to the library. Each AU has separate Messages, Calls, Lock Screen and X drafts and separate IndexedDB attachment databases. Instagram identity fields are saved for a future studio; this revision does not add an Instagram studio.
+
+Create basic/full names, contact names/photos, X profiles and Instagram identities in the dashboard's **Characters** section. Saved characters are available in Messages sender/contact/group selectors, X author selectors, call contacts and notification senders. Updates propagate on opening a studio. A field deliberately changed inside a studio is retained as a historical override instead of being overwritten by subsequent shared-profile edits.
+
+Existing unscoped browser drafts and media remain in their original storage and appear in **Recovered Draftroom AU**. The legacy workspace imports contact and X identities without deleting the original messages, IDs, posts or attachments. New AUs use new storage namespaces. An already-open tab remains bound to its original AU even if another tab switches projects. Each studio retains its portable JSON/media backup and image-export features. Browser storage is local to the device/browser, not a cloud account.
+
+**Messages:** select the sender above the phone, type inside the phone's message field and press Enter or Send. The plus button uploads photos/videos directly. Long-press, double-click, or keyboard-focus a bubble and press Enter for Tapbacks, reaction attribution/removal, editing, deletion and ordering. **Conversation tools** reveals the secondary editor for timestamps, events, typing indicators and all legacy customization. The FaceTime outline matches the supplied proportions and adapts to the selected theme.
+
+**X:** use the floating plus or timeline composer to post; the reply action opens a linked reply composer. Repost opens a character picker with Repost/undo and Quote Repost, including quotes of quotes. The phone composers support four mixed photo/video attachments. Likes, reposts and bookmarks toggle counts and hide zeroes. Text profile tabs filter Posts, Replies, Reposts and Media; Posts has a sorting dropdown. Relevant retains its dropdown, and View Quotes opens linked quotes. Continuous reply chains keep vertical connectors without internal horizontal borders; separate branches retain separators. **Advanced editing** preserves all detailed fields and saved-post tools.
+
+Run **npm run test:au** for migration, independent project switching, shared character updates/historical overrides, direct phone interactions and image checks. **npm test** covers all five test suites. If using installed Chrome instead of Playwright's downloaded browser, set **DRAFTROOM_BROWSER=chrome**.
 
 ## X / Twitter studio
 
@@ -18,17 +33,17 @@ Post detail crops have no X.com wordmark. Click a timeline/profile post to open 
 
 Research references: [X profile customization](https://help.x.com/en/managing-your-account/how-to-customize-your-profile), [post types](https://help.x.com/en/using-x/types-of-posts), [mixed media](https://help.x.com/en/using-x/how-to-post), [replies](https://help.x.com/en/using-x/mentions-and-replies) and [reposts](https://help.x.com/en/using-x/how-to-repost). Screenshot layout references were supplied by the user; their personal images are not bundled with the site.
 
-Run `npm run test:x` for character save/reuse, badge/follow/count states, uploads, linked replies/quotes/reposts and cycle prevention, four-photo/mixed-video grids, playback/reload persistence, polls, twelve theme/layout PNG exports, JPG/clipboard/screen/frame options, project round trips, mobile layout and isolation from the other three studios. `npm test` runs all four studios.
+Run `npm run test:x` for character save/reuse, badge/follow/count states, uploads, linked replies/quotes/reposts and cycle prevention, four-photo/mixed-video grids, playback/reload persistence, polls, twelve theme/layout PNG exports, JPG/clipboard/screen/frame options, project round trips, mobile layout and isolation from the other three studios. `npm test` runs all four studios plus AU project workflows.
 
 ## Lock Screen studio
 
 [Open Lock Screen](https://jeilprogress.github.io/draftroom-studio/lockscreen.html), the third studio on the home screen. Messages and Calls code and drafts are kept separate.
 
-- Classic and Liquid Glass-inspired notification cards, wallpaper controls and clock materials
+- Classic iOS 18-style solid clock and notification layout, with wallpaper controls
 - Independent Light/Dark notification appearance, including grouped cards, stack layers, Focus summaries, music cards and exported images
-- Liquid Display vector numerals with layered translucency and clipped surface highlights; Classic retains its rounded numeric outlines
-- Ten clock interpretations, with rounded SVG numerals for the standard/rounded/thin/bold/condensed/outline styles and local fonts for the remaining styles, three numeral sets, font weight/color/size controls, glass opacity and vertical stretching with a draggable or keyboard-adjustable resize handle
-- Editable date/inline widget line and 12 widget types: weather, temperature, battery, activity rings, calendar, alarm, world clock, reminders, stocks, sunrise, moon and custom; a four-space row that can sit below the clock or near the bottom
+- Six reference-inspired solid vector clock presets: Rounded, Soft bold, Fine, Editorial serif, Stencil and Double outline
+- Three numeral sets and adjustable weight, size and color; vector clock paths use natural proportions without stretching, glow or blur
+- Editable date/inline widget line and 12 widget types: weather, temperature, battery, activity rings, calendar, alarm, world clock, reminders, stocks, sunrise, moon and custom; a four-space row below the clock
 - Six original wallpaper presets, photo uploads, zoom/position/dim controls and an optional transparent foreground upload for layered depth
 - **49 bundled app icons** (39 App Store entries and 10 system-app illustrations), plus live App Store search and custom app/icon uploads
 - App-specific presets for Messages/group texts/media, missed calls, FaceTime, X posts/replies/quotes, Instagram DMs/story mentions/likes, Facebook interactions and Discord messages; arbitrary editable notifications for any other app
@@ -40,13 +55,13 @@ Run `npm run test:x` for character save/reuse, badge/follow/count states, upload
 - Carrier/network/battery/charging, lock symbol, Dynamic Island/notch, selectable and clickable bottom shortcuts, and a visual Now Playing card
 - Independent browser draft, portable JSON backup/import, screen or phone-frame PNG/JPG and clipboard image copying
 
-Clock styles and glass are web approximations using licensed rounded numeral outlines and local fonts; they do not bundle Apple's fonts, reproduce native optical refraction or automatically segment a wallpaper subject. The transparent foreground upload provides the depth layer. The phone picture captures the visible part of the notification list; scroll the preview to choose which cards are visible. Widgets and notifications are fictional editable values, not live account data or installed apps. App Store search sends only the typed app query to Apple; selected remote icons are embedded locally when available. See `vendor/lock-apps/NOTICE.md` for artwork provenance.
+Clock styles are reference-based web recreations using openly licensed Nunito, Inter and Bodoni Moda numeric outlines and local numeral fallbacks. They do not bundle Apple fonts or claim pixel-identical Apple typography. The transparent foreground upload provides the depth layer. The phone picture captures the visible part of the notification list; scroll the preview to choose which cards are visible. Widgets and notifications are fictional editable values, not live account data or installed apps. App Store search sends only the typed app query to Apple; selected remote icons are embedded locally when available. See `vendor/lock-apps/NOTICE.md` for artwork provenance.
 
 Design references: [Apple Lock Screen customization](https://support.apple.com/en-am/guide/iphone/-iph4d0e6c351/ios), [Apple Lock Screen features and notification views](https://support.apple.com/en-ph/guide/iphone/-iphcd5c65ccf/ios), and [Apple Search API](https://developer.apple.com/library/archive/documentation/AudioVideo/Conceptual/iTuneSearchAPI/index.html).
 
-Run `npm run test:lockscreen` for its browser checks. Set `LOCKSCREEN_LIVE_SEARCH=1` to additionally verify Apple's live JSONP search and icon embedding; the normal test deterministically checks that integration at its network boundary. The test covers clocks, notification templates/grouping/privacy, all widget types and capacity, Focus, music/shortcuts, uploads/depth, persistence/project round trips, real image downloads and clipboard copying, mobile layout and preservation of the other drafts. It also checks visible clock pixels in the Liquid Glass PNG.
+Run `npm run test:lockscreen` for its browser checks. Set `LOCKSCREEN_LIVE_SEARCH=1` to additionally verify Apple's live JSONP search and icon embedding; the normal test deterministically checks that integration at its network boundary. The test covers clocks, notification templates/grouping/privacy, all widget types and capacity, Focus, music/shortcuts, uploads/depth, persistence/project round trips, real image downloads and clipboard copying, mobile layout and preservation of the other drafts. It also checks visible clock pixels in the Classic PNG.
 
-[Open Draftroom](https://jeilprogress.github.io/draftroom-studio/). GitHub Pages publishes the configured repository source; no application build is required. The home page is `index.html`, Messages is `messages.html`, and Calls is `calls.html`. Keep these pages with their adjacent CSS/JS files, `.nojekyll`, and `vendor/`.
+[Open Draftroom](https://jeilprogress.github.io/draftroom-studio/). GitHub Pages publishes the configured repository source; no application build is required. The project home is `index.html`, the studio dashboard is `dashboard.html`, Messages is `messages.html`, and Calls is `calls.html`. Keep these pages with their adjacent CSS/JS files, `.nojekyll`, and `vendor/`.
 
 ## Home and Calls
 

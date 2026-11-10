@@ -3,12 +3,12 @@ const assert=require('node:assert/strict'),fs=require('node:fs/promises'),path=r
 const root=path.resolve(__dirname,'..'),out=path.join(root,'test-results');
 const server=http.createServer(async(req,res)=>{try{const name=new URL(req.url,'http://localhost').pathname;const target=path.join(root,name==='/'?'index.html':name);if(!target.startsWith(root+path.sep))throw Error();res.setHeader('Content-Type',({'.html':'text/html','.css':'text/css','.js':'text/javascript','.webp':'image/webp'})[path.extname(target)]||'application/octet-stream');res.end(await fs.readFile(target));}catch{res.writeHead(404);res.end();}});
 (async()=>{
-  await fs.mkdir(out,{recursive:true});await new Promise(r=>server.listen(0,'127.0.0.1',r));const browser=await chromium.launch();
+  await fs.mkdir(out,{recursive:true});await new Promise(r=>server.listen(0,'127.0.0.1',r));const browser=await chromium.launch({channel:process.env.DRAFTROOM_BROWSER||undefined});
   try{
     const context=await browser.newContext({viewport:{width:1440,height:1080},acceptDownloads:true}),page=await context.newPage(),errors=[];
     page.on('pageerror',e=>errors.push(e.message));const base=`http://127.0.0.1:${server.address().port}`;
-    await page.goto(base);await page.screenshot({path:path.join(out,'home-desktop.png'),fullPage:true});
-    await page.locator('#open-messages').click();await page.waitForSelector('.chat-bubble');
+    await page.goto(base+'/dashboard.html');await page.screenshot({path:path.join(out,'home-desktop.png'),fullPage:true});
+    await page.locator('#open-messages').click();await page.waitForSelector('.chat-bubble');await page.locator('#message-tools-toggle').click();
     await page.locator('#quick-text').fill('Keep this Messages draft untouched');await page.locator('#quick-send').click();await page.waitForTimeout(450);
     const messagesDraft=await page.evaluate(()=>localStorage.getItem('draftroom-imessage-v1'));
     await page.getByRole('link',{name:'Home ↗',exact:true}).click();await page.locator('#open-calls').click();await page.waitForSelector('.call-control');

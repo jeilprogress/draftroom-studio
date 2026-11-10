@@ -1,6 +1,6 @@
 (() => {
   'use strict';
-  const $=id=>document.getElementById(id),KEY='draftroom-calls-v1';
+  const $=id=>document.getElementById(id),KEY=window.DraftroomAU?.key('draftroom-calls-v1')||'draftroom-calls-v1';
   const defaults=()=>({version:'27',stage:'outgoing',service:'phone',person:'contact',name:'Alex',number:'+1 (740) 555-0190',label:'mobile',photo:'',duration:'00:46',time:'9:41',battery:100,background:'ocean',speaker:false,mute:false,holdNotice:false,incomingLayout:'slide'});
   let state=defaults();try{state={...state,...JSON.parse(localStorage.getItem(KEY)||'{}')};}catch{}
   const allowed={version:['18','27'],stage:['outgoing','incoming','connected','ended'],service:['phone','facetime'],person:['contact','number'],background:['ocean','poster','dusk','graphite'],incomingLayout:['slide','buttons']};
@@ -8,6 +8,7 @@
   for(const key of ['name','number','label','duration','time'])state[key]=String(state[key]??defaults()[key]).slice(0,key==='name'?70:40);
   if(typeof state.photo!=='string'||!state.photo.startsWith('data:image/'))state.photo='';
   state.battery=Math.max(1,Math.min(100,Number(state.battery)||100));
+  const contactControl=document.createElement('label');contactControl.className='field-label';contactControl.innerHTML='AU contact<select id="call-au-character" class="field-input"><option value="">Custom contact</option>'+(window.DraftroomAU?.characters()||[]).map(c=>'<option value="'+c.id+'">'+c.name.replace(/[<>&]/g,'')+'</option>').join('')+'</select>';document.querySelector('.call-settings-scroll')?.prepend(contactControl);document.getElementById('call-au-character').onchange=e=>{const c=window.DraftroomAU?.characters().find(c=>c.id===e.target.value);if(!c)return;state.person='contact';state.name=c.contactName||c.name;state.photo=c.contactPhoto;state.auId=c.id;state.auSnapshot={name:state.name,photo:state.photo};sync();render();save();};const shared=window.DraftroomAU?.characters().find(c=>c.id===state.auId);if(shared){if(state.name===state.auSnapshot?.name)state.name=shared.contactName||shared.name;if(state.photo===state.auSnapshot?.photo)state.photo=shared.contactPhoto;}window.addEventListener('pagehide',()=>{clearTimeout(saveTimer);try{localStorage.setItem(KEY,JSON.stringify(state));}catch{}});
   let saveTimer,toastTimer,keypad=false,digits='',sceneNote='';
   const escape=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const emoji=s=>window.DraftroomEmoji?.render(s)??escape(s);
