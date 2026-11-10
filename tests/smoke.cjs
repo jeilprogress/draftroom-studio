@@ -31,7 +31,7 @@ const server=http.createServer(async(req,res)=>{
     await page.locator('.chat-bubble').filter({hasText:'A message worth saving'}).waitFor();
     await page.locator('[data-kind="group"]').click();await page.locator('#add-member').click();
     assert.equal(await page.locator('.member-row').count(),3);
-    await page.locator('[data-member-name]').first().fill('Alex');
+    await page.locator('[data-member-name]').first().fill('Name');
     const photo=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+a6ioAAAAASUVORK5CYII=','base64');
     await page.locator('[data-member-photo]').first().setInputFiles({name:'avatar.png',mimeType:'image/png',buffer:photo});
     await page.waitForSelector('.stack-avatar img');

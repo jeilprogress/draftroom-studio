@@ -12,7 +12,7 @@ const server=http.createServer(async(req,res)=>{try{const name=new URL(req.url,'
     await page.locator('#quick-text').fill('Keep this Messages draft untouched');await page.locator('#quick-send').click();await page.waitForTimeout(450);
     const messagesDraft=await page.evaluate(()=>localStorage.getItem('draftroom-imessage-v1'));
     await page.getByRole('link',{name:'Home ↗',exact:true}).click();await page.locator('#open-calls').click();await page.waitForSelector('.call-control');
-    await page.locator('#call-name').fill('Naomi ❤️');await page.locator('#call-duration').fill('12:34');
+    await page.locator('#call-name').fill('Character ❤️');await page.locator('#call-duration').fill('12:34');
     await page.locator('#call-stage').selectOption('connected');
     await page.locator('[data-call-action="speaker"]').click();await page.locator('[data-call-action="mute"]').click();
     for(const action of ['speaker','mute'])assert.equal(await page.locator(`[data-call-action="${action}"]`).getAttribute('aria-pressed'),'true');

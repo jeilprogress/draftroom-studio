@@ -8,9 +8,9 @@
   const emojiText=s=>window.DraftroomEmoji?.render(s)??escape(s);
   const bubbleTail='<svg xmlns="http://www.w3.org/2000/svg" width="14" height="19" viewBox="0 0 14 19"><path d="M0 0C1 9 4 14 14 17C8 20 2 18 0 14Z" fill="currentColor"/></svg>';
   const defaults = () => ({
-    version:'18',theme:'light',color:'blue',kind:'single',chatName:'Mathine',contactPhoto:'',phoneTime:'9:41',
+    version:'18',theme:'light',color:'blue',kind:'single',chatName:'Name',contactPhoto:'',phoneTime:'9:41',
     dateText:'Today 9:41 AM',chatStatus:'normal',receipt:'delivered',wallpaper:'sky',wallpaperImage:'',glass:55,focusNotifyAnyway:false,
-    participants:[{id:'member_1',name:'Mathine',photo:''},{id:'member_2',name:'Ayi',photo:''}],
+    participants:[{id:'member_1',name:'Name',photo:''},{id:'member_2',name:'Character',photo:''}],
     messages:[
       {id:uid(),type:'timestamp',text:'Today 9:41 AM',from:'contact'},
       {id:uid(),type:'text',text:'Hey, are you awake?',from:'contact',receipt:'none'},
@@ -29,17 +29,17 @@
   const mediaUrls = new Map();
   const mediaBlobs = new Map();
   const notify = message => { $('toast').textContent=message;$('toast').classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').classList.remove('visible'),3300); };
-  const persist = () => { try {localStorage.setItem(STORAGE_KEY,JSON.stringify(state));$('save-status').textContent='Saved in this browser';} catch { $('save-status').textContent='Storage full'; notify('Browser storage is full. Save your project as JSON.');} };
+  const persist = () => { if(window.DraftroomAU?.isDeleted())return;try {localStorage.setItem(STORAGE_KEY,JSON.stringify(state));$('save-status').textContent='Saved in this browser';} catch { $('save-status').textContent='Storage full'; notify('Browser storage is full. Save your project as JSON.');} };
   const scheduleSave = () => { $('save-status').textContent='Saving…';clearTimeout(saveTimer);saveTimer=setTimeout(persist,350); };
 
   const openDB = () => new Promise(resolve=>{
     if(!('indexedDB' in window)){resolve(null);return;}
     try {const req=indexedDB.open(window.DraftroomAU?.db('draftroom-media')||'draftroom-media',1);
       req.onupgradeneeded=()=>{if(!req.result.objectStoreNames.contains('assets'))req.result.createObjectStore('assets');};
-      req.onsuccess=()=>resolve(req.result);req.onerror=()=>resolve(null);
+      req.onsuccess=()=>{req.result.onversionchange=()=>req.result.close();resolve(req.result);};req.onerror=()=>resolve(null);
     } catch {resolve(null);}
   });
-  const writeMedia = async (key,blob) => {mediaBlobs.set(key,blob);if(mediaUrls.has(key))URL.revokeObjectURL(mediaUrls.get(key));mediaUrls.set(key,URL.createObjectURL(blob));if(!mediaDB)return;await new Promise(resolve=>{try{const tx=mediaDB.transaction('assets','readwrite');tx.objectStore('assets').put(blob,key);tx.oncomplete=resolve;tx.onerror=resolve;}catch{resolve();}});};
+  const writeMedia = async (key,blob) => {if(window.DraftroomAU?.isDeleted())throw Error('AU deleted');mediaBlobs.set(key,blob);if(mediaUrls.has(key))URL.revokeObjectURL(mediaUrls.get(key));mediaUrls.set(key,URL.createObjectURL(blob));if(!mediaDB)return;await new Promise(resolve=>{try{const tx=mediaDB.transaction('assets','readwrite');tx.objectStore('assets').put(blob,key);tx.oncomplete=resolve;tx.onerror=resolve;}catch{resolve();}});};
   const readMedia = async key => {if(mediaBlobs.has(key))return mediaBlobs.get(key);if(!mediaDB)return null;return await new Promise(resolve=>{try{const req=mediaDB.transaction('assets','readonly').objectStore('assets').get(key);req.onsuccess=()=>resolve(req.result||null);req.onerror=()=>resolve(null);}catch{resolve(null);}});};
   const loadMedia = async ()=>{const ids=[...new Set(state.messages.map(x=>x.mediaId).filter(Boolean))];for(const key of ids){const blob=await readMedia(key);if(blob){mediaBlobs.set(key,blob);mediaUrls.set(key,URL.createObjectURL(blob));}}renderCards();renderPreview();};
   const toDataURL = blob => new Promise((resolve,reject)=>{const fr=new FileReader();fr.onload=()=>resolve(fr.result);fr.onerror=reject;fr.readAsDataURL(blob);});
@@ -51,7 +51,7 @@
   function senderName(from){if(from==='me')return 'You';if(state.kind==='single')return state.chatName||'Contact';return state.participants.find(p=>p.id===from)?.name||'Member';}
   function senderPhoto(from){if(state.kind==='single')return state.contactPhoto||'';return state.participants.find(p=>p.id===from)?.photo||'';}
   function senderAvatar(from,klass='small-chat-avatar'){const name=senderName(from);const photo=senderPhoto(from);return `<span class="${klass}">${photo?`<img src="${escape(photo)}" alt="" />`:escape((name||'?').slice(0,1).toUpperCase())}</span>`;}
-  function makeMessage(type){return {id:uid(),type,from:state.kind==='group'?state.participants[0]?.id||'me':'contact',text:type==='text'?'':type==='timestamp'?(state.dateText||'Today 9:41 AM'):type==='system'?'Mathine left the conversation.':'',receipt:'default',eventKind:'custom',mediaId:null,poster:'',fileName:''};}
+  function makeMessage(type){return {id:uid(),type,from:state.kind==='group'?state.participants[0]?.id||'me':'contact',text:type==='text'?'':type==='timestamp'?(state.dateText||'Today 9:41 AM'):type==='system'?'Name left the conversation.':'',receipt:'default',eventKind:'custom',mediaId:null,poster:'',fileName:''};}
   const eventKinds=[['custom','Custom event'],['joined','Someone joined'],['left','Someone left'],['removed','Someone removed someone'],['dnd','Focus status enabled'],['blocked','Cannot message this person'],['unsent','Message unsent']];
   function eventText(kind){const who=state.kind==='group'?(state.participants[0]?.name||'Someone'):(state.chatName||'Someone');const other=state.kind==='group'?(state.participants[1]?.name||'someone'):'someone';return {joined:`${who} joined the conversation.`,left:`${who} left the conversation.`,removed:`${who} removed ${other} from the conversation.`,dnd:`${who} has notifications silenced.`,blocked:'You cannot send messages to this conversation.',unsent:`${who} unsent a message.`}[kind]||'';}
 
@@ -185,7 +185,7 @@
   for(const [key,field,values] of [['version','version',['18','27']],['theme','theme',['light','dark']],['color','color',['blue','green']],['kind','kind',['single','group']]]){
     document.querySelectorAll(`[data-${key}]`).forEach(b=>b.addEventListener('click',()=>{
       const value=b.dataset[key];if(!values.includes(value))return;state[field]=value;
-      if(field==='kind'){state.messages.forEach(m=>{if(m.from!=='me')m.from=value==='group'?state.participants[0]?.id||'me':'contact';});if(value==='group'&&state.chatName==='Mathine')state.chatName='The Group Chat';else if(value==='single'&&state.chatName==='The Group Chat')state.chatName='Mathine';}
+      if(field==='kind'){state.messages.forEach(m=>{if(m.from!=='me')m.from=value==='group'?state.participants[0]?.id||'me':'contact';});if(value==='group'&&state.chatName==='Name')state.chatName='The Group Chat';else if(value==='single'&&state.chatName==='The Group Chat')state.chatName='Name';}
       renderAll();scheduleSave();
     }));
   }
